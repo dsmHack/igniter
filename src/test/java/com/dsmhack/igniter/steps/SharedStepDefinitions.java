@@ -54,4 +54,6 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
         assertTrue( integrationServicesConfiguration.getActiveIntegrationServices().stream().anyMatch(integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName)));
     }
 
+
+
 }
