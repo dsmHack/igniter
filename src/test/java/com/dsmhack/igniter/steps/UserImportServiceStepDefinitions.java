@@ -6,7 +6,7 @@ import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 
-public class UserImportServiceStepDefinitions extends SpringContextConfiguration {
+public class UserImportServiceStepDefinitions  {
 //    public com.dsmhack.igniter.steps.UserImportServiceStepDefinitions() {
 //
 //    }

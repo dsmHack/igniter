@@ -5,7 +5,7 @@ import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 
-public class GitHubIntegrationStepDefinitions extends SpringContextConfiguration {
+public class GitHubIntegrationStepDefinitions  {
     @Given("^The git hub oauth key is configured$")
     public void theGitHubOauthKeyIsConfigured() throws Throwable {
         // Write code here that turns the phrase above into concrete actions

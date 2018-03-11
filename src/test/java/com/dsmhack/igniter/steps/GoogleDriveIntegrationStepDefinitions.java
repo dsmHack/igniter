@@ -7,7 +7,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
-public class GoogleDriveIntegrationStepDefinitions  extends SpringContextConfiguration {
+public class GoogleDriveIntegrationStepDefinitions  {
     @Given("^The google drive api key is configured$")
     public void theGoogleDriveApiKeyIsConfigured() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
