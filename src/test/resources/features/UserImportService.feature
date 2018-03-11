@@ -12,3 +12,5 @@ Feature: A config file is loaded and data is supplied
       | doe      | john      | anEmail | aGithubUserName |
 
 
+  Scenario: it should return the "exampleUser.csv" as a string
+    When the getFileAsString is called with the following path "exampleUser.csv"
