@@ -5,9 +5,12 @@ import com.dsmhack.igniter.services.UserImportService;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +36,7 @@ public class UserImportServiceStepDefinitions  {
     }
 
     @When("^the getUsers is called the following user exists$")
-    public void theUserFileIsReadAndaUserIsInTheUserArray(List<User> users) throws Throwable {
+    public void theUserFileIsReadAndaUserIsInTheUserArrayList(List<User> users) throws Throwable {
         User expectedUser = users.get(0);
         ArrayList<User> actualUsers = this.userImportService.getUsers();
         //message, expected, actual
@@ -53,4 +56,13 @@ public class UserImportServiceStepDefinitions  {
     }
 
 
+    @When("^the getFileAsString is called with the following path \"([^\"]*)\"$")
+    public void theGetFileAsStringIsCalledWithTheFollowingPath(String filePath) throws Throwable {
+        String exampleFileContent = "sherpa";
+        File fileMock = Mockito.mock(File.class);
+        PowerMockito.whenNew(File.class).withArguments(filePath).thenReturn(fileMock);
+        Mockito.when(fileMock.exists()).thenReturn(true);
+        this.userImportService = new UserImportService();
+        String actualFile = this.getFileAsString(filePath);
+    }
 }
