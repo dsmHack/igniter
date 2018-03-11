@@ -5,6 +5,7 @@ import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
 
 public class SlackIntegrationStepDefinitions  {
     @Given("^The Slack api key is configured$")
@@ -21,6 +22,18 @@ public class SlackIntegrationStepDefinitions  {
 
     @Then("^The Slack Channel of \"([^\"]*)\" exists$")
     public void theSlackChannelOfExists(String channelName) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @When("^The Admin adds the user with the email of \"([^\"]*)\" to the team \"([^\"]*)\"$")
+    public void theAdminAddsTheUserWithTheEmailOfToTheTeam(String userEmail, String teamName) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^the user with the email of \"([^\"]*)\" should be present in the slack channel \"([^\"]*)\"$")
+    public void theUserWithTheEmailOfShouldBePresentInTheSlackChannel(String userEmail, String teamName) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         throw new PendingException();
     }

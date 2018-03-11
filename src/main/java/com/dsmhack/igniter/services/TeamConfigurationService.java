@@ -16,7 +16,7 @@ public class TeamConfigurationService {
 
 
     public void createTeam(String teamName) {
-
+        this.integrationServicesConfiguration.getActiveIntegrationServices().stream().forEach(integrationService -> integrationService.createTeam(teamName));
     }
 
 

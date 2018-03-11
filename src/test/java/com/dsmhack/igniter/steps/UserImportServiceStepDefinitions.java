@@ -1,24 +1,29 @@
 package com.dsmhack.igniter.steps;
 
-import com.dsmhack.igniter.SpringContextConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.UserImportService;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
+
 public class UserImportServiceStepDefinitions  {
+
+    @Autowired
     private UserImportService userImportService;
     private ArrayList<User> expectedUser;
 
     @When("the service is started it loads the default config file of \"user.csv\"")
     public void aServiceNeedsConfigData() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
-        userImportService = new UserImportService();
+
     }
 
     @Given("^a user.csv file is present$")
@@ -27,22 +32,25 @@ public class UserImportServiceStepDefinitions  {
         //throw new PendingException();
     }
 
-    @When("^the getUsers is called$")
-    public void theUesrFileIsReadAndaUserIsInTheUserArray() throws Throwable {
-        userImportService = new UserImportService();
-        expectedUser = new ArrayList<>();
-        expectedUser.add(getExpectedUser());
-        ArrayList<User> actualUsers = userImportService.getUsers();
+    @When("^the getUsers is called the following user exists$")
+    public void theUserFileIsReadAndaUserIsInTheUserArray(List<User> users) throws Throwable {
+        User expectedUser = users.get(0);
+        ArrayList<User> actualUsers = this.userImportService.getUsers();
         //message, expected, actual
-        assertEquals("should be one user", expectedUser, actualUsers.get(0));
+
+        assertEquals("should be one user",1, userImportService.getUsers().size());
+        assertEquals("should be user we created", expectedUser, actualUsers.get(0));
     }
 
-    private User getExpectedUser() {
-        User expectedUser = new User();
-        expectedUser.setFirstName("john");
-        expectedUser.setLastName("doe");
-        expectedUser.setEmail("anEmail");
-        expectedUser.setGithubUsername("aGithubUserName");
-        return expectedUser;
+    @Given("^The following users are created$")
+    public void theFollowingUsersAreCreated(List<User> users    ) throws Throwable {
+        this.userImportService = new UserImportService();
     }
+
+    @When("^the service is started it loads the default config file of \"([^\"]*)\"$")
+    public void theServiceIsStartedItLoadsTheDefaultConfigFileOf(String userConfigFile) throws Throwable {
+//        this.userImportService = new UserImportService();
+    }
+
+
 }
