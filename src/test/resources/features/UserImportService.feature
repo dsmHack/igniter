@@ -1,6 +1,7 @@
 Feature: A config file is loaded and data is supplied
   Background:
-    Given the users.csv is present
+    Given a user.csv file is present
+
 
 
   Scenario: A service needs config data
