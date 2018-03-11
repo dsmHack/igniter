@@ -1,17 +1,17 @@
 package com.dsmhack.igniter.services;
 
-import com.dsmhack.igniter.configuration.IntegrationConfiguration;
+import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TeamConfigurationService {
 
-    private final IntegrationConfiguration integrationConfiguration;
+    private final IntegrationServicesConfiguration integrationServicesConfiguration;
 
     @Autowired
-    public TeamConfigurationService(IntegrationConfiguration integrationConfiguration) {
-        this.integrationConfiguration = integrationConfiguration;
+    public TeamConfigurationService(IntegrationServicesConfiguration integrationServicesConfiguration) {
+        this.integrationServicesConfiguration = integrationServicesConfiguration;
     }
 
 
