@@ -29,7 +29,7 @@ public class IntegrationServicesConfiguration {
     }
 
     public void activateIntegrationService(String integrationServiceName) {
-         if(availableServices.stream().noneMatch(integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName))){
+         if(!activeIntegrations.contains(integrationServiceName)){
              activeIntegrations.add(integrationServiceName);
          }
     }
