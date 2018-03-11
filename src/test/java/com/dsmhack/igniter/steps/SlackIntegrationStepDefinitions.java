@@ -1,11 +1,12 @@
 package com.dsmhack.igniter.steps;
 
+import com.dsmhack.igniter.SpringContextConfiguration;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 
-public class SlackIntegrationStepDefinitions {
+public class SlackIntegrationStepDefinitions extends SpringContextConfiguration {
     @Given("^The Slack api key is configured$")
     public void theSlackApiKeyIsConfigured() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
