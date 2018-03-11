@@ -49,11 +49,11 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
         integrationServicesConfiguration.activateIntegrationService(integrationServiceName);
     }
 
-
-    @Then("^The only active integration service is \"([^\"]*)\"$")
+    @Then("^The active integration services contain \"([^\"]*)\"$")
     public void theOnlyActiveIntegrationServiceIs(String integrationServiceName) throws Throwable {
         assertTrue( integrationServicesConfiguration.getActiveIntegrationServices().stream().anyMatch(integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName)));
     }
+
 
 
 }

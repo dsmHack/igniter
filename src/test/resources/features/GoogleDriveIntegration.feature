@@ -1,14 +1,12 @@
 Feature: A new team is created in google drive
 
   Background:
-    Given The google drive api key is configured
-    And The google drive secret key is configured
-    And Google drive integration is enabled
+    Given The integration service "googleDrive" is enabled
+    And The integration service googleDrive is configured
 
   Scenario: Admin creates a new team that has not previously been created
     When The Admin creates the team "Team_1"
     Then The google Drive folder of "Team_1" exists
-
 
   Scenario: Admin creates a new user
     Given The Admin creates the team "Team_1"

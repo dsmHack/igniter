@@ -7,27 +7,10 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
-public class GoogleDriveIntegrationStepDefinitions  extends SpringContextConfiguration {
-    @Given("^The google drive api key is configured$")
-    public void theGoogleDriveApiKeyIsConfigured() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
-    @And("^The google drive secret key is configured$")
-    public void theGoogleDriveSecretKeyIsConfigured() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
+public class GoogleDriveIntegrationStepDefinitions  {
 
     @Then("^The google Drive folder of \"([^\"]*)\" exists$")
     public void theGoogleDriveFolderOfExists(String teamName) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
-    @And("^Google drive integration is enabled$")
-    public void googleDriveIntegrationIsEnabled() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         throw new PendingException();
     }
@@ -48,6 +31,12 @@ public class GoogleDriveIntegrationStepDefinitions  extends SpringContextConfigu
 
     @And("^The admin created a \"([^\"]*)\"$")
     public void theAdminCreatedA(String teamSpecificFolderPath) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @And("^The integration service googleDrive is configured$")
+    public void theIntegrationServiceGoogleDriveIsConfigured() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         throw new PendingException();
     }
