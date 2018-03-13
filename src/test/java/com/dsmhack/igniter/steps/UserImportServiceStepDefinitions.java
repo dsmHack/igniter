@@ -5,16 +5,21 @@ import com.dsmhack.igniter.services.UserImportService;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 
 public class UserImportServiceStepDefinitions  {
@@ -59,10 +64,15 @@ public class UserImportServiceStepDefinitions  {
     @When("^the getFileAsString is called with the following path \"([^\"]*)\"$")
     public void theGetFileAsStringIsCalledWithTheFollowingPath(String filePath) throws Throwable {
         String exampleFileContent = "sherpa";
-        File fileMock = Mockito.mock(File.class);
-        PowerMockito.whenNew(File.class).withArguments(filePath).thenReturn(fileMock);
-        Mockito.when(fileMock.exists()).thenReturn(true);
+//        File fileMock = Mockito.mock(File.class);
+//        PowerMockito.whenNew(File.class).withArguments(filePath).thenReturn(fileMock);
+//        Mockito.when(fileMock.exists()).thenReturn(true);
         this.userImportService = new UserImportService();
-        String actualFile = this.getFileAsString(filePath);
+        try {
+            String actualFile = this.userImportService.getFileAsString(filePath);
+            assertNotNull(actualFile);
+        } catch (Exception ex) {
+            fail("exception hit");
+        }
     }
 }

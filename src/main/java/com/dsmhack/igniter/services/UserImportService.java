@@ -26,6 +26,10 @@ public class UserImportService {
         this.users.add(user);
     }
 
+    public String getFileAsString(String filePath) {
+        return null;
+    }
+
 //    public UserImportService(@Value("${dsmhack.igniter.user.import.path:exampleUser.csv}") String userImportFilePath) {
 //        this.userImportFilePath = userImportFilePath;
 //    }
