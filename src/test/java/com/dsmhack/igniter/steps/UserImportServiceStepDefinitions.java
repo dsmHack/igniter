@@ -63,6 +63,6 @@ public class UserImportServiceStepDefinitions  {
         PowerMockito.whenNew(File.class).withArguments(filePath).thenReturn(fileMock);
         Mockito.when(fileMock.exists()).thenReturn(true);
         this.userImportService = new UserImportService();
-        String actualFile = this.getFileAsString(filePath);
+//        String actualFile = this.getFileAsString(filePath);
     }
 }

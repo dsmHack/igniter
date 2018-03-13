@@ -8,4 +8,9 @@ public class SlackIntegrationService implements IntegrationService {
     public String getIntegrationServiceName() {
         return "slack";
     }
+
+    @Override
+    public void createTeam(String teamName) {
+
+    }
 }
