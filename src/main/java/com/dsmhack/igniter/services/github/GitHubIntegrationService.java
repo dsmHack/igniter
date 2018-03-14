@@ -3,35 +3,22 @@ package com.dsmhack.igniter.services.github;
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.OrganizationService;
-import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.TeamService;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.kohsuke.github.GHOrganization.Permission.PUSH;
 
 @Service
 public class GitHubIntegrationService implements IntegrationService {
@@ -41,12 +28,8 @@ public class GitHubIntegrationService implements IntegrationService {
     final ObjectMapper objectMapper;
     private GitHubClient gitHubClient;
     private GitHubConfig gitHubConfig;
-    private TeamService teamService;
-    private OrganizationService organizationService;
-    private boolean configured = false;
-    private RepositoryService repositoryService;
-    private User orgUser;
     private GitHub gitHubService;
+    private GHOrganization organization;
 
 
     @Autowired
@@ -62,82 +45,82 @@ public class GitHubIntegrationService implements IntegrationService {
 
     @Override
     public void createTeam(String teamName) {
-        GHCreateRepositoryBuilder repository = null;
-        GHRepository ghRepository = null;
+        GHRepository ghRepository;
         GHTeam team;
-        String team1;
         try {
             ghRepository = buildOrGetRepository(teamName);
             team = buildOrGetTeam(teamName, ghRepository);
+            team.add(ghRepository, GHOrganization.Permission.PUSH);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
 
-
-   @Override
+    @Override
     public Map<String, String> validateTeamName(String team) {
         return null;
     }
 
     private GHTeam buildOrGetTeam(String teamName, GHRepository ghRepository) throws IOException {
-        GHOrganization organization = gitHubService.getOrganization(gitHubConfig.getOrgName());
-
-        GHTeam team = organization.getTeamByName(teamName);
-
-        if (team != null) {
-            GHTeam matchingTeam = ghRepository.getTeams().stream().filter(t -> t.getId() == team.getId()).findFirst().orElse(null);
-            if(matchingTeam!=null){
-                if(!PUSH.equals (GHOrganization.Permission.valueOf(matchingTeam.getPermission()))){
-                    matchingTeam.add(ghRepository, PUSH);
-                }
-              }
-            return team;
+        GHTeam team = getTeam(teamName);
+        if (team == null) {
+            createTeam(gitHubConfig.getOrgName(), teamName, Collections.singletonList(ghRepository.getFullName()));
+            team = getTeam(teamName);
         }
-
-        return organization.createTeam(teamName, PUSH, ghRepository);
+        return team;
     }
 
-//    private Team buildTeam(String teamName) throws IOException {
-//        Team team = new Team();
-//        team.setName(teamName);
-//        team.setPermission("push");
-//        return teamService.createTeam(gitHubConfig.getOrgName(), team);
-//    }
+    private GHTeam getTeam(String teamName) throws IOException {
+        return organization.getTeamByName(teamName);
+    }
+
+    public Team createTeam(String organization, String teamName, List<String> repoNames) {
+        Team team = new Team();
+        team.setPermission("admin");
+        team.setName(teamName);
+        StringBuilder uri = new StringBuilder("/orgs");
+        uri.append('/').append(organization);
+        uri.append("/teams");
+        Map<String, Object> params = new HashMap();
+        params.put("name", team.getName());
+        params.put("permission", team.getPermission());
+        params.put("privacy", "closed");
+        if (repoNames != null) {
+            params.put("repo_names", repoNames);
+        }
+        try {
+            return (Team) gitHubClient.post(uri.toString(), params, Team.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
 
     private GHRepository buildOrGetRepository(String teamName) throws IOException {
         GHRepository repository = getRepositoryIfExists(teamName);
         if (repository == null) {
-            repository = gitHubService.createRepository(teamName).description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'").private_(false).create();
+            repository = organization.createRepository(teamName).description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'").create();
         }
         return repository;
     }
 
     private GHRepository getRepositoryIfExists(String teamName) throws IOException {
-        return gitHubService.getMyself().getRepository(teamName);
+        return organization.getRepository(teamName);
     }
 
     @PostConstruct
     public void configure() throws IOException {
-        if (this.configured)
-            return;
         File file = Paths.get(integrationServicesConfiguration.getKeyPath(), "git-hub-credentials.json").toFile();
-        gitHubConfig= objectMapper.readerFor(GitHubConfig.class).readValue(file);
+        gitHubConfig = objectMapper.readerFor(GitHubConfig.class).readValue(file);
         gitHubService = new GitHubBuilder().withOAuthToken(gitHubConfig.getOAuthKey(), gitHubConfig.getOrgName()).build();
-        this.configured = true;
-    }
-
-    private class GitHubAuth implements ClientHttpRequestInterceptor {
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-            HttpHeaders headers = request.getHeaders();
-             if(headers.get("Authorization")==null){
-                 headers.add("Authorization","token "+gitHubConfig.getOAuthKey());
-             }
-
-            return execution.execute(request,body);
-        }
+        organization = gitHubService.getOrganization(gitHubConfig.getOrgName());
+        gitHubClient = new GitHubClient();
+        gitHubClient.setOAuth2Token(gitHubConfig.getOAuthKey());
     }
 
 }

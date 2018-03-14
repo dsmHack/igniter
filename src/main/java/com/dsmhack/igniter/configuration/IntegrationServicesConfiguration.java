@@ -22,5 +22,11 @@ public class IntegrationServicesConfiguration {
     @Value("${keys.base.path:./}")
     private String keyPath;
 
+    @Value("${team.prefix:''}")
+    String teamPrefix;
+
+    public String getCompositeName(String teamName) {
+        return getTeamPrefix() + teamName;
+    }
 
 }
