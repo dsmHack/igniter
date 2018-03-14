@@ -4,12 +4,14 @@ import com.dsmhack.igniter.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.lang.reflect.Array;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserImportService {
@@ -26,8 +28,17 @@ public class UserImportService {
         this.users.add(user);
     }
 
-    public String getFileAsString(String filePath) {
-        return null;
+    public Stream<String> getFileAsString(String filePath) {
+        Path resolvedFilePath;
+        Stream<String> output;
+        try {
+            resolvedFilePath = Paths.get(filePath);
+//            System.out.println("resolvedFile Path: " + resolvedFilePath.toAbsolutePath().toString());
+            return java.nio.file.Files.lines(resolvedFilePath);
+        } catch (IOException e) {
+            System.out.println("Error: invalid path");
+            return null;
+        }
     }
 
 //    public UserImportService(@Value("${dsmhack.igniter.user.import.path:exampleUser.csv}") String userImportFilePath) {
