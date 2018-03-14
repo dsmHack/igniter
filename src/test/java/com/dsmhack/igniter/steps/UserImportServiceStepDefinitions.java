@@ -50,29 +50,4 @@ public class UserImportServiceStepDefinitions  {
         assertEquals("should be user we created", expectedUser, actualUsers.get(0));
     }
 
-    @Given("^The following users are created$")
-    public void theFollowingUsersAreCreated(List<User> users    ) throws Throwable {
-        this.userImportService = new UserImportService();
-    }
-
-    @When("^the service is started it loads the default config file of \"([^\"]*)\"$")
-    public void theServiceIsStartedItLoadsTheDefaultConfigFileOf(String userConfigFile) throws Throwable {
-//        this.userImportService = new UserImportService();
-    }
-
-
-    @When("^the getFileAsString is called with the following path \"([^\"]*)\"$")
-    public void theGetFileAsStringIsCalledWithTheFollowingPath(String filePath) throws Throwable {
-        String exampleFileContent = "sherpa";
-//        File fileMock = Mockito.mock(File.class);
-//        PowerMockito.whenNew(File.class).withArguments(filePath).thenReturn(fileMock);
-//        Mockito.when(fileMock.exists()).thenReturn(true);
-        this.userImportService = new UserImportService();
-        try {
-            String actualFile = this.userImportService.getFileAsString(filePath);
-            assertNotNull(actualFile);
-        } catch (Exception ex) {
-            fail("exception hit");
-        }
-    }
 }
