@@ -4,41 +4,50 @@ import com.dsmhack.igniter.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import javax.jws.soap.SOAPBinding;
+import java.io.*;
 import java.lang.reflect.Array;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserImportService {
 
-    private String userImportFilePath;
+    public Stream<String> getFileAsStringStream(String filePath) {
+        Path resolvedFilePath;
+        Stream<String> output;
+        try {
+            resolvedFilePath = Paths.get(filePath);
+//            System.out.println("resolvedFile Path: " + resolvedFilePath.toAbsolutePath().toString());
+            return java.nio.file.Files.lines(resolvedFilePath);
+        } catch (IOException e) {
+            System.out.println("Error: invalid path");
+            return null;
+        }
+    }
 
-    private ArrayList<User> users = new ArrayList<>();
+    public List<User> getUsersByList(String filepath) {
+        List<User> users = new ArrayList<>();
 
-    public ArrayList<User> getUsers() {
+        Stream<String> usersStream = this.getFileAsStringStream(filepath);
+        if (usersStream == null){
+            return users;
+        } else {
+            users.add(new User());
+        }
         return users;
     }
 
-    public void addUser(User user) {
-        this.users.add(user);
+    public User parseStringIntoUser(String userInfo) {
+        User parsedUser = new User();
+        String[] userParts = userInfo.split(",");
+        parsedUser.setFirstName(userParts[0]);
+
+        return parsedUser;
     }
-
-    public String getFileAsString(String filePath) {
-        return null;
-    }
-
-//    public UserImportService(@Value("${dsmhack.igniter.user.import.path:exampleUser.csv}") String userImportFilePath) {
-//        this.userImportFilePath = userImportFilePath;
-//    }
-
-//    public void loadUsers() throws FileNotFoundException {
-//        File file = new File(this.userImportFilePath);
-//        if(file.exists()){
-//            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-//
-//        }
-//    }
 }
