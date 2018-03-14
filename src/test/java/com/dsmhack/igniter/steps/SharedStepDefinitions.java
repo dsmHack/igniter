@@ -1,6 +1,7 @@
 package com.dsmhack.igniter.steps;
 
 import com.dsmhack.igniter.SpringContextConfiguration;
+import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationServicesRegistry;
 import com.dsmhack.igniter.services.TeamConfigurationService;
 import cucumber.api.DataTable;
@@ -24,6 +25,9 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
     public void theAdminCreatesTheTeam(String teamName) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         teamConfigurationService.createTeam(teamName);
+        User user = new User();
+        user.setGithubUsername("Kickercost");
+        teamConfigurationService.addUserToTeam(teamName,user);
     }
 
     @When("^The following user is added$")

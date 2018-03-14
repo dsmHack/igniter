@@ -1,5 +1,7 @@
-package com.dsmhack.igniter.services;
+package com.dsmhack.igniter.services.gdrive;
 
+import com.dsmhack.igniter.models.User;
+import com.dsmhack.igniter.services.IntegrationService;
 import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -17,7 +19,12 @@ public class GoogleDriveIntegrationService implements IntegrationService {
     }
 
     @Override
+    public void addUserToTeam(String compositeName, User user) {
+
+    }
+
+    @Override
     public String getIntegrationServiceName() {
-        return "googleDrive";
+        return "gdrive";
     }
 }

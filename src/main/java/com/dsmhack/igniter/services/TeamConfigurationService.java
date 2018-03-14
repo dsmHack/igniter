@@ -1,6 +1,7 @@
 package com.dsmhack.igniter.services;
 
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
+import com.dsmhack.igniter.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +23,7 @@ public class TeamConfigurationService {
     }
 
 
-
+    public void addUserToTeam(String teamName, User user) {
+        this.integrationServicesRegistry.getActiveIntegrationServices().forEach(integrationService -> integrationService.addUserToTeam(integrationServicesConfiguration.getCompositeName(teamName),user));
+    }
 }

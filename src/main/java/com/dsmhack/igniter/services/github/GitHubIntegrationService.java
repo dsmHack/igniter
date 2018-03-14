@@ -1,6 +1,7 @@
 package com.dsmhack.igniter.services.github;
 
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
+import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.egit.github.core.Repository;
@@ -62,6 +63,18 @@ public class GitHubIntegrationService implements IntegrationService {
         return null;
     }
 
+    @Override
+    public void addUserToTeam(String teamName, User user) {
+        GHUser ghUser = null;
+        try {
+            ghUser = gitHubService.getUser(user.getGithubUsername());
+            organization.getTeamByName(teamName).add(ghUser, GHTeam.Role.MEMBER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private GHTeam buildOrGetTeam(String teamName, GHRepository ghRepository) throws IOException {
         GHTeam team = getTeam(teamName);
         if (team == null) {
@@ -75,7 +88,7 @@ public class GitHubIntegrationService implements IntegrationService {
         return organization.getTeamByName(teamName);
     }
 
-    public Team createTeam(String organization, String teamName, List<String> repoNames) {
+    private Team createTeam(String organization, String teamName, List<String> repoNames) throws IOException {
         Team team = new Team();
         team.setPermission("admin");
         team.setName(teamName);
@@ -89,12 +102,8 @@ public class GitHubIntegrationService implements IntegrationService {
         if (repoNames != null) {
             params.put("repo_names", repoNames);
         }
-        try {
-            return (Team) gitHubClient.post(uri.toString(), params, Team.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        params.put("maintainers",Collections.singletonList(gitHubService.getMyself().getLogin()));
+        return (Team) gitHubClient.post(uri.toString(), params, Team.class);
     }
 
 

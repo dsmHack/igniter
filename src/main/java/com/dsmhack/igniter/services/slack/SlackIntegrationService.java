@@ -1,5 +1,7 @@
-package com.dsmhack.igniter.services;
+package com.dsmhack.igniter.services.slack;
 
+import com.dsmhack.igniter.models.User;
+import com.dsmhack.igniter.services.IntegrationService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -19,5 +21,10 @@ public class SlackIntegrationService implements IntegrationService {
     @Override
     public Map<String, String> validateTeamName(String team) {
         return null;
+    }
+
+    @Override
+    public void addUserToTeam(String compositeName, User user) {
+
     }
 }
