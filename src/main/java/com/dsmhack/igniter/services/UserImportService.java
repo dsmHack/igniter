@@ -4,31 +4,21 @@ import com.dsmhack.igniter.models.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.jws.soap.SOAPBinding;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class UserImportService {
 
-    private String userImportFilePath;
-
-    private ArrayList<User> users = new ArrayList<>();
-
-    public ArrayList<User> getUsers() {
-        return users;
-    }
-
-    public void addUser(User user) {
-        this.users.add(user);
-    }
-
-    public Stream<String> getFileAsString(String filePath) {
+    public Stream<String> getFileAsStringStream(String filePath) {
         Path resolvedFilePath;
         Stream<String> output;
         try {
@@ -41,15 +31,23 @@ public class UserImportService {
         }
     }
 
-//    public UserImportService(@Value("${dsmhack.igniter.user.import.path:exampleUser.csv}") String userImportFilePath) {
-//        this.userImportFilePath = userImportFilePath;
-//    }
+    public List<User> getUsersByList(String filepath) {
+        List<User> users = new ArrayList<>();
 
-//    public void loadUsers() throws FileNotFoundException {
-//        File file = new File(this.userImportFilePath);
-//        if(file.exists()){
-//            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-//
-//        }
-//    }
+        Stream<String> usersStream = this.getFileAsStringStream(filepath);
+        if (usersStream == null){
+            return users;
+        } else {
+            users.add(new User());
+        }
+        return users;
+    }
+
+    public User parseStringIntoUser(String userInfo) {
+        User parsedUser = new User();
+        String[] userParts = userInfo.split(",");
+        parsedUser.setFirstName(userParts[0]);
+
+        return parsedUser;
+    }
 }

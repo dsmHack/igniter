@@ -40,14 +40,4 @@ public class UserImportServiceStepDefinitions  {
         //throw new PendingException();
     }
 
-    @When("^the getUsers is called the following user exists$")
-    public void theUserFileIsReadAndaUserIsInTheUserArrayList(List<User> users) throws Throwable {
-        User expectedUser = users.get(0);
-        ArrayList<User> actualUsers = this.userImportService.getUsers();
-        //message, expected, actual
-
-        assertEquals("should be one user",1, userImportService.getUsers().size());
-        assertEquals("should be user we created", expectedUser, actualUsers.get(0));
-    }
-
 }
