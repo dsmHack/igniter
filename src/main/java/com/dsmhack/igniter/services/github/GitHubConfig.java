@@ -1,4 +1,4 @@
-package com.dsmhack.igniter.services;
+package com.dsmhack.igniter.services.github;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
