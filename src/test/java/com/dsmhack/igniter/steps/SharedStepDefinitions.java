@@ -1,7 +1,7 @@
 package com.dsmhack.igniter.steps;
 
 import com.dsmhack.igniter.SpringContextConfiguration;
-import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
+import com.dsmhack.igniter.services.IntegrationServicesRegistry;
 import com.dsmhack.igniter.services.TeamConfigurationService;
 import cucumber.api.DataTable;
 import cucumber.api.PendingException;
@@ -18,7 +18,7 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
     private TeamConfigurationService teamConfigurationService;
 
     @Autowired
-    IntegrationServicesConfiguration integrationServicesConfiguration;
+    IntegrationServicesRegistry integrationServicesRegistry;
 
     @When("^The Admin creates the team \"([^\"]*)\"$")
     public void theAdminCreatesTheTeam(String teamName) throws Throwable {
@@ -46,12 +46,12 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
 
     @Given("^The integration service \"([^\"]*)\" is enabled$")
     public void theIntegrationServiceIsEnabled(String integrationServiceName) throws Throwable {
-        integrationServicesConfiguration.activateIntegrationService(integrationServiceName);
+        integrationServicesRegistry.activateIntegrationService(integrationServiceName);
     }
 
     @Then("^The active integration services contain \"([^\"]*)\"$")
     public void theOnlyActiveIntegrationServiceIs(String integrationServiceName) throws Throwable {
-        assertTrue( integrationServicesConfiguration.getActiveIntegrationServices().stream().anyMatch(integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName)));
+        assertTrue( integrationServicesRegistry.getActiveIntegrationServices().stream().anyMatch(integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName)));
     }
 
 

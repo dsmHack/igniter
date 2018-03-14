@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class TeamConfigurationService {
 
-    private final IntegrationServicesConfiguration integrationServicesConfiguration;
+    private final IntegrationServicesRegistry integrationServicesRegistry;
 
     @Autowired
-    public TeamConfigurationService(IntegrationServicesConfiguration integrationServicesConfiguration) {
-        this.integrationServicesConfiguration = integrationServicesConfiguration;
+    public TeamConfigurationService(IntegrationServicesRegistry integrationServicesRegistry) {
+        this.integrationServicesRegistry = integrationServicesRegistry;
     }
 
 
     public void createTeam(String teamName) {
-        this.integrationServicesConfiguration.getActiveIntegrationServices().stream().forEach(integrationService -> integrationService.createTeam(teamName));
+        this.integrationServicesRegistry.getActiveIntegrationServices().forEach(integrationService -> integrationService.createTeam(teamName));
     }
 
 
