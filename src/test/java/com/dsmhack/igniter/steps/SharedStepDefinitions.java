@@ -27,6 +27,7 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
         teamConfigurationService.createTeam(teamName);
         User user = new User();
         user.setGithubUsername("Kickercost");
+        user.setEmail("joshua@kickercost.com");
         teamConfigurationService.addUserToTeam(teamName,user);
     }
 

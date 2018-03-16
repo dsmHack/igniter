@@ -3,6 +3,8 @@ package com.dsmhack.igniter.services.slack;
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
+import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
+import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
 import com.dsmhack.igniter.services.github.GitHubConfig;
 import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.methods.impl.MethodsClientImpl;
@@ -40,8 +42,15 @@ public class SlackIntegrationService implements IntegrationService {
         return null;
     }
 
+
+
     @Override
     public void addUserToTeam(String compositeName, User user) {
+
+    }
+
+    @Override
+    public void removeUserFromTeam(String teamName, User user) throws IOException, DataConfigurationException, ActionNotRequiredException {
 
     }
 
