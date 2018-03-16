@@ -8,6 +8,15 @@ public class User {
     private String email;
     private String githubUsername;
 
+    public User(){}
+
+    public User(String firstName, String lastName, String email, String githubUsername) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.githubUsername = githubUsername;
+    }
+
 
     public String getLastName() {
         return lastName;
