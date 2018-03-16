@@ -1,6 +1,9 @@
 package com.dsmhack.igniter.configuration;
 
 import com.dsmhack.igniter.services.IntegrationService;
+import com.dsmhack.igniter.services.github.GitHubConfig;
+import com.dsmhack.igniter.services.github.GitHubIntegrationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,8 +31,19 @@ public class IntegrationServicesConfiguration {
     @Value("${team.prefix:''}")
     String teamPrefix;
 
+    final  ObjectMapper objectMapper;
+
+    @Autowired
+    public IntegrationServicesConfiguration(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     public String getCompositeName(String teamName) {
         return getTeamPrefix() + teamName;
     }
 
+    public <T> T getKeyContent(String filePath, Class<T> clazz) throws IOException {
+        File file = Paths.get(getKeyPath(), filePath).toFile();
+        return objectMapper.readerFor(clazz).readValue(file);
+    }
 }

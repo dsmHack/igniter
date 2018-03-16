@@ -1,13 +1,30 @@
 package com.dsmhack.igniter.services.slack;
 
+import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
+import com.dsmhack.igniter.services.github.GitHubConfig;
+import com.github.seratch.jslack.Slack;
+import com.github.seratch.jslack.api.methods.impl.MethodsClientImpl;
+import com.github.seratch.jslack.api.methods.request.oauth.OAuthAccessRequest;
+import com.github.seratch.jslack.common.http.SlackHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.Map;
 
 @Service
 public class SlackIntegrationService implements IntegrationService {
+    private final IntegrationServicesConfiguration integrationServicesConfiguration;
+    private SlackConfig slackConfig;
+
+    @Autowired
+    public SlackIntegrationService(IntegrationServicesConfiguration integrationServicesConfiguration) {
+        this.integrationServicesConfiguration = integrationServicesConfiguration;
+    }
+
     @Override
     public String getIntegrationServiceName() {
         return "slack";
@@ -27,4 +44,11 @@ public class SlackIntegrationService implements IntegrationService {
     public void addUserToTeam(String compositeName, User user) {
 
     }
+
+
+    @PostConstruct
+    public void configure() throws IOException {
+        this.slackConfig = integrationServicesConfiguration.getKeyContent("slack-credentials.json", SlackConfig.class);
+    }
+
 }

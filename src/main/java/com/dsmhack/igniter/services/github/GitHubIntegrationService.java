@@ -4,18 +4,14 @@ import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.TeamService;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -124,12 +120,11 @@ public class GitHubIntegrationService implements IntegrationService {
 
     @PostConstruct
     public void configure() throws IOException {
-        File file = Paths.get(integrationServicesConfiguration.getKeyPath(), "git-hub-credentials.json").toFile();
-        gitHubConfig = objectMapper.readerFor(GitHubConfig.class).readValue(file);
-        gitHubService = new GitHubBuilder().withOAuthToken(gitHubConfig.getOAuthKey(), gitHubConfig.getOrgName()).build();
-        organization = gitHubService.getOrganization(gitHubConfig.getOrgName());
+        this.gitHubConfig = integrationServicesConfiguration.getKeyContent("git-hub-credentials.json",GitHubConfig.class);
+        gitHubService = new GitHubBuilder().withOAuthToken(this.gitHubConfig.getOAuthKey(), this.gitHubConfig.getOrgName()).build();
+        organization = gitHubService.getOrganization(this.gitHubConfig.getOrgName());
         gitHubClient = new GitHubClient();
-        gitHubClient.setOAuth2Token(gitHubConfig.getOAuthKey());
+        gitHubClient.setOAuth2Token(this.gitHubConfig.getOAuthKey());
     }
 
 }
