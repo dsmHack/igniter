@@ -53,13 +53,34 @@ public class TestUserImportService {
     }
 
     @Test
+    public void testUserImportService_constructor() {
+        String firstName = "aFirstName";
+        String lastName = "aLastName";
+        String email = "aEmail";
+        String githubUsername = "aGithubUser";
+        User actualUser = new User(firstName, lastName, email, githubUsername);
+
+
+        assertEquals(actualUser.getFirstName(), firstName);
+        assertEquals(actualUser.getLastName(), lastName);
+        assertEquals(actualUser.getEmail(), email);
+        assertEquals(actualUser.getGithubUsername(), githubUsername);
+
+    }
+
+
+    @Test
     public void testParseStringIntoUser_returnsNullOnFailedParse() {
         this.userImportService = new UserImportService();
         Stream<String> exampleUserFile = this.userImportService.getFileAsStringStream(exampleUserFilePath);
         Object[] examplesUsersFromFile = exampleUserFile.toArray();
         User user = this.userImportService.parseStringIntoUser(examplesUsersFromFile[1].toString());
 
+
         assertEquals("john", user.getFirstName());
+        assertEquals("doe", user.getLastName());
+        assertEquals("aEmail", user.getEmail());
+        assertEquals("aGithubUserName", user.getGithubUsername());
     }
 
 }
