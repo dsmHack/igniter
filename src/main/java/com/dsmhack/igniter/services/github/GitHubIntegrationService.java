@@ -3,6 +3,8 @@ package com.dsmhack.igniter.services.github;
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
+import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
+import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -12,10 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class GitHubIntegrationService implements IntegrationService {
@@ -59,16 +58,45 @@ public class GitHubIntegrationService implements IntegrationService {
         return null;
     }
 
-    @Override
-    public void addUserToTeam(String teamName, User user) {
-        GHUser ghUser = null;
-        try {
-            ghUser = gitHubService.getUser(user.getGithubUsername());
-            organization.getTeamByName(teamName).add(ghUser, GHTeam.Role.MEMBER);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private GHTeam getTeamByName(String teamName) throws IOException, DataConfigurationException {
+        GHTeam teamByName = organization.getTeamByName(teamName);
+        if (teamByName == null)
+            throw new DataConfigurationException(String.format("Tried to work with non-existent team %s", teamName));
+        return teamByName;
+    }
 
+
+    public boolean isUserMember(String teamName, User user) throws DataConfigurationException, IOException {
+        GHTeam teamByName = null;
+        try {
+            teamByName = getTeamByName(teamName);
+        } catch (DataConfigurationException e) {
+            throw new DataConfigurationException(String.format("Error in fetching team %s while checking for user '%s' membership ", user.getGithubUsername(), teamName), e);
+        }
+        return getUserForTeam(user, teamByName) != null;
+    }
+
+    private GHUser getUserForTeam(User user, GHTeam team) throws IOException {
+        return team.getMembers().stream().filter(u -> u.getLogin().equals(user.getGithubUsername())).findFirst().orElse(null);
+    }
+
+
+    @Override
+    public void addUserToTeam(String teamName, User user) throws ActionNotRequiredException, DataConfigurationException, IOException {
+        if (isUserMember(teamName, user))
+            throw new ActionNotRequiredException(String.format("User '%s' is already on the team %s", user.getGithubUsername(), teamName));
+        GHUser ghUser=gitHubService.getUser(user.getGithubUsername());
+        GHTeam teamByName = organization.getTeamByName(teamName);
+        teamByName.add(ghUser, GHTeam.Role.MEMBER);
+    }
+
+    @Override
+    public void removeUserFromTeam(String teamName, User user) throws IOException, DataConfigurationException, ActionNotRequiredException {
+        if(!isUserMember(teamName,user)){
+            throw new ActionNotRequiredException(String.format("User '%s' is already not part of the team '%s'",user.getGithubUsername(),teamName ));
+        }
+        GHTeam team = getTeam(teamName);
+        team.remove(getUserForTeam(user,team));
     }
 
     private GHTeam buildOrGetTeam(String teamName, GHRepository ghRepository) throws IOException {
@@ -98,12 +126,9 @@ public class GitHubIntegrationService implements IntegrationService {
         if (repoNames != null) {
             params.put("repo_names", repoNames);
         }
-        params.put("maintainers",Collections.singletonList(gitHubService.getMyself().getLogin()));
+        params.put("maintainers", Collections.singletonList(gitHubService.getMyself().getLogin()));
         return (Team) gitHubClient.post(uri.toString(), params, Team.class);
     }
-
-
-
 
 
     private GHRepository buildOrGetRepository(String teamName) throws IOException {
@@ -120,7 +145,7 @@ public class GitHubIntegrationService implements IntegrationService {
 
     @PostConstruct
     public void configure() throws IOException {
-        this.gitHubConfig = integrationServicesConfiguration.getKeyContent("git-hub-credentials.json",GitHubConfig.class);
+        this.gitHubConfig = integrationServicesConfiguration.getKeyContent("git-hub-credentials.json", GitHubConfig.class);
         gitHubService = new GitHubBuilder().withOAuthToken(this.gitHubConfig.getOAuthKey(), this.gitHubConfig.getOrgName()).build();
         organization = gitHubService.getOrganization(this.gitHubConfig.getOrgName());
         gitHubClient = new GitHubClient();

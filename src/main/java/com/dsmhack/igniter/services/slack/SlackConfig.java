@@ -13,4 +13,5 @@ import lombok.Setter;
 public class SlackConfig {
     private String clientId;
     private String clientSecret;
+    private String oAuthKey;
 }
