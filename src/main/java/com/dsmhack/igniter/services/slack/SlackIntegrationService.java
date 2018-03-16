@@ -42,6 +42,8 @@ public class SlackIntegrationService implements IntegrationService {
         return null;
     }
 
+
+
     @Override
     public void addUserToTeam(String compositeName, User user) {
 
