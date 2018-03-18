@@ -2,27 +2,34 @@ package com.dsmhack.igniter;
 
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.UserImportService;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
 public class TestUserImportService {
 
     private UserImportService userImportService;
-    private String validFileName = "test_file.txt";
-    private String validFilePath = "src/test/resources/" + validFileName;
     private String exampleUserFilePath = "src/test/resources/exampleUser.csv";
     private String invalidFilePath = "anInvalidFilePath.txt";
-    private String[] expectedFileContent = {"cat 1, cat 2, gibberish", "stewie,squiggs,sherpa" };
+    private List<User> expectedUsers;
+
+    @Before
+    public void before() {
+        expectedUsers = new ArrayList<User>();
+        expectedUsers.add(new User("john", "doe", "aEmail", "aGithubUserName"));
+        expectedUsers.add(new User("Stewie", "Rolek", "stewie@email.com", "stewieGithub"));
+        expectedUsers.add(new User("LilSquiggle", "Rolek", "lilsquiggle@email.com", "lilsquiggleGithub"));
+    }
 
     @Test
     public void testGetFileAsString_returnsNullWhenNoFileAndNotThrow() {
         this.userImportService = new UserImportService();
         try {
-            Stream<String> actualFile = this.userImportService.getFileAsStringStream(invalidFilePath);
+            List<String> actualFile = this.userImportService.getFileAsStringStream(invalidFilePath);
             assertNull(actualFile);
         } catch (Exception ex) {
             fail("un-expected, exception hit");
@@ -32,31 +39,30 @@ public class TestUserImportService {
     @Test
     public void testGetFileAsString_returnsValidFileAsString() {
         this.userImportService = new UserImportService();
-        Stream<String> actualFileContents = this.userImportService.getFileAsStringStream(validFilePath);
-        assertEquals("file contents should match", expectedFileContent[1], actualFileContents.toArray()[1]);
+        List<String> actualFileContents = this.userImportService.getFileAsStringStream(exampleUserFilePath);
+        assertEquals("file contents should match", "First Name,Last Name,", actualFileContents.get(0).substring(0, 21));
     }
 
     @Test
-    public void testLoadUsers_shouldReturnAnEmptyListWhenInvalidFilePath(){
+    public void testLoadUsers_shouldReturnANullWhenInvalidFilePath(){
         this.userImportService = new UserImportService();
         List<User> users = this.userImportService.getUsersByList("anInvalidFilePath");
 
-        assert users.size() == 0;
+        assert users == null;
     }
 
     @Test
-    public void testLoadUsers_shouldReturnAListWithOneUser() {
+    public void testLoadUsers_shouldReturnAListOfUsersWhenValidFilePath(){
         this.userImportService = new UserImportService();
-        List<User> users = this.userImportService.getUsersByList(validFilePath);
+        List<User> actualUsers = this.userImportService.getUsersByList(exampleUserFilePath);
 
-        assert users.size() == 1;
+        assertEquals("Got matching lists of Users", expectedUsers, actualUsers);
     }
 
-
     @Test
-    public void testParseStringIntoUser_returnsNullOnFailedParse() {
+    public void testParseStringIntoUser_returnsAUser() {
         this.userImportService = new UserImportService();
-        Stream<String> exampleUserFile = this.userImportService.getFileAsStringStream(exampleUserFilePath);
+        List<String> exampleUserFile = this.userImportService.getFileAsStringStream(exampleUserFilePath);
         Object[] examplesUsersFromFile = exampleUserFile.toArray();
         User user = this.userImportService.parseStringIntoUser(examplesUsersFromFile[1].toString());
 

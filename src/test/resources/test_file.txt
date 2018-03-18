@@ -1,2 +1,0 @@
-cat 1, cat 2, gibberish
-stewie,squiggs,sherpa
