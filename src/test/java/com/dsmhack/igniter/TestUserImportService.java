@@ -52,22 +52,6 @@ public class TestUserImportService {
         assert users.size() == 1;
     }
 
-    @Test
-    public void testUserImportService_constructor() {
-        String firstName = "aFirstName";
-        String lastName = "aLastName";
-        String email = "aEmail";
-        String githubUsername = "aGithubUser";
-        User actualUser = new User(firstName, lastName, email, githubUsername);
-
-
-        assertEquals(actualUser.getFirstName(), firstName);
-        assertEquals(actualUser.getLastName(), lastName);
-        assertEquals(actualUser.getEmail(), email);
-        assertEquals(actualUser.getGithubUsername(), githubUsername);
-
-    }
-
 
     @Test
     public void testParseStringIntoUser_returnsNullOnFailedParse() {
