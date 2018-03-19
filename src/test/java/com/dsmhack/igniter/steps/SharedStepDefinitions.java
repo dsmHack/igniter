@@ -6,6 +6,7 @@ import com.dsmhack.igniter.services.IntegrationServicesRegistry;
 import com.dsmhack.igniter.services.TeamConfigurationService;
 import cucumber.api.DataTable;
 import cucumber.api.PendingException;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -20,6 +21,7 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
 
     @Autowired
     IntegrationServicesRegistry integrationServicesRegistry;
+    private User user;
 
     @When("^The Admin creates the team \"([^\"]*)\"$")
     public void theAdminCreatesTheTeam(String teamName) throws Throwable {
@@ -37,10 +39,9 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
         throw new PendingException();
     }
 
-    @When("^The following user is created$")
-    public void theFollowingUserIsCreated(DataTable users) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    @When("^The following user is staged$")
+    public void theFollowingUserIsStaged(User user) throws Throwable {
+        this.user = user;
     }
 
     @When("^the Admin assigns the user to \"([^\"]*)\"$")
@@ -60,5 +61,8 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
     }
 
 
-
+    @And("^The staged user is added to the team \"([^\"]*)\"$")
+    public void theStagedUserIsAddedToTheTeam(String teamName) throws Throwable {
+        teamConfigurationService.addUserToTeam(teamName,this.user);
+    }
 }
