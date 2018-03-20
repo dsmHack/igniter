@@ -1,29 +1,27 @@
 package com.dsmhack.igniter;
 
+import com.dsmhack.igniter.services.TeamConfigurationService;
 import com.dsmhack.igniter.services.UserImportService;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Configuration
 @Getter
 @Setter
+@Service
 public class BatchRunner {
-    private UserImportService userImportService;
+    private final UserImportService userImportService;
+    private final TeamConfigurationService teamConfigurationService;
 
-    public BatchRunner() {}
-
-    public BatchRunner(UserImportService userImportService) {
+    @Autowired
+    public BatchRunner(TeamConfigurationService teamConfigurationService,UserImportService userImportService) {
+        this.teamConfigurationService = teamConfigurationService;
         this.userImportService = userImportService;
     }
 
-    @Value("${team.prefix:''}")
-    String team;
+    public void onboardEveryone() {
 
-    public void onboardSlack(){
-        System.out.println("team: " + team);
-        this.userImportService.parseStringIntoUser("idk");
     }
 
 }
