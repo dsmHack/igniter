@@ -137,6 +137,9 @@ public class SlackIntegrationService implements IntegrationService {
 
     @PostConstruct
     public void configure() throws IOException {
+        if(!integrationServicesConfiguration.getActiveIntegrations().contains(this.getIntegrationServiceName())) {
+            return;
+        }
         this.slackConfig = integrationServicesConfiguration.getKeyContent("slack-credentials.json", SlackConfig.class);
         slack = Slack.getInstance();
 

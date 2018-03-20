@@ -10,13 +10,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class TestBatchRunner extends SpringContextConfiguration {
+@ContextConfiguration(classes = IgniterApplication.class, loader = SpringBootContextLoader.class )
+public class TestBatchRunner {
     @Autowired
     private UserImportService userImportService;
     @Autowired

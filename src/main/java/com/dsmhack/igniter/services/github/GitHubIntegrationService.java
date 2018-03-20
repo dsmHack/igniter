@@ -146,6 +146,9 @@ public class GitHubIntegrationService implements IntegrationService {
 
     @PostConstruct
     public void configure() throws IOException {
+        if(!integrationServicesConfiguration.getActiveIntegrations().contains(this.getIntegrationServiceName())){
+            return;
+        }
         this.gitHubConfig = integrationServicesConfiguration.getKeyContent("git-hub-credentials.json", GitHubConfig.class);
         gitHubService = new GitHubBuilder().withOAuthToken(this.gitHubConfig.getOAuthKey(), this.gitHubConfig.getOrgName()).build();
         organization = gitHubService.getOrganization(this.gitHubConfig.getOrgName());
