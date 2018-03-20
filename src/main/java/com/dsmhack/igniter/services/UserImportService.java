@@ -1,30 +1,29 @@
 package com.dsmhack.igniter.services;
 
 import com.dsmhack.igniter.models.User;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.jws.soap.SOAPBinding;
-import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.file.InvalidPathException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 public class UserImportService {
 
-    public Stream<String> getFileAsStringStream(String filePath) {
+    public List<String> getFileAsStringStream(String filePath) {
         Path resolvedFilePath;
-        Stream<String> output;
+        List<String> output = new ArrayList<String>();
         try {
             resolvedFilePath = Paths.get(filePath);
-//            System.out.println("resolvedFile Path: " + resolvedFilePath.toAbsolutePath().toString());
-            return java.nio.file.Files.lines(resolvedFilePath);
+            Stream<String> linesStream = java.nio.file.Files.lines(resolvedFilePath);
+            linesStream.forEach(line -> output.add(line));
+            linesStream.close();
+            return output;
+
+
         } catch (IOException e) {
             System.out.println("Error: invalid path");
             return null;
@@ -32,15 +31,17 @@ public class UserImportService {
     }
 
     public List<User> getUsersByList(String filepath) {
-        List<User> users = new ArrayList<>();
+        List<String> userLines = this.getFileAsStringStream(filepath);
+        if (userLines != null){
+            userLines.remove(0); //remove header
+            List<User> users = new ArrayList<User>();
+            userLines.forEach(userInfo -> {
+                users.add(parseStringIntoUser(userInfo));
+            });
 
-        Stream<String> usersStream = this.getFileAsStringStream(filepath);
-        if (usersStream == null){
             return users;
-        } else {
-            users.add(new User());
         }
-        return users;
+        return null;
     }
 
     public User parseStringIntoUser(String userInfo) {

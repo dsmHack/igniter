@@ -1,17 +1,17 @@
 package com.dsmhack.igniter.services;
 
+import com.dsmhack.igniter.models.TeamValidation;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
 import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
 
 import java.io.IOException;
-import java.util.Map;
 
 public interface IntegrationService {
     String getIntegrationServiceName();
 
-    void createTeam(String teamName);
-    Map<String,String> validateTeamName(String team);
+    void createTeam(String teamName) throws DataConfigurationException, ActionNotRequiredException;
+    TeamValidation validateTeam(String team) throws DataConfigurationException;
 
     void addUserToTeam(String teamName, User user) throws ActionNotRequiredException, DataConfigurationException, IOException;
 

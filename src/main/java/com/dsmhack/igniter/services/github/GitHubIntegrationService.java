@@ -1,6 +1,7 @@
 package com.dsmhack.igniter.services.github;
 
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
+import com.dsmhack.igniter.models.TeamValidation;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
@@ -54,7 +55,7 @@ public class GitHubIntegrationService implements IntegrationService {
 
 
     @Override
-    public Map<String, String> validateTeamName(String team) {
+    public TeamValidation validateTeam(String team) {
         return null;
     }
 
@@ -66,11 +67,11 @@ public class GitHubIntegrationService implements IntegrationService {
     }
 
 
-    public boolean isUserMember(String teamName, User user) throws DataConfigurationException, IOException {
+    private boolean isUserMember(String teamName, User user) throws DataConfigurationException, IOException {
         GHTeam teamByName = null;
         try {
             teamByName = getTeamByName(teamName);
-        } catch (DataConfigurationException e) {
+        } catch (Exception e) {
             throw new DataConfigurationException(String.format("Error in fetching team %s while checking for user '%s' membership ", user.getGithubUsername(), teamName), e);
         }
         return getUserForTeam(user, teamByName) != null;

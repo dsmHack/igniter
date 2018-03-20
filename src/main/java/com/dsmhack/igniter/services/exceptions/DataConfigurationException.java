@@ -8,11 +8,7 @@ public class DataConfigurationException extends Throwable {
         super(message);
     }
 
-    public DataConfigurationException(String message, DataConfigurationException e) {
-        super(message, e);
-    }
-
-    public DataConfigurationException(String message, SlackApiException e) {
+    public DataConfigurationException(String message, Exception e) {
         super(message,e);
     }
 }

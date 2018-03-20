@@ -1,5 +1,6 @@
 package com.dsmhack.igniter.services.gdrive;
 
+import com.dsmhack.igniter.models.TeamValidation;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
-import java.util.Map;
 
 @Service
 public class GoogleDriveIntegrationService implements IntegrationService {
@@ -17,7 +17,7 @@ public class GoogleDriveIntegrationService implements IntegrationService {
     }
 
     @Override
-    public Map<String, String> validateTeamName(String team) {
+    public TeamValidation validateTeam(String team) {
         return null;
     }
 
