@@ -31,6 +31,9 @@ public class IntegrationServicesConfiguration {
     @Value("${team.prefix:''}")
     String teamPrefix;
 
+    @Value("${team.number.of.teams}")
+    Integer teamNumber;
+
     final  ObjectMapper objectMapper;
 
     @Autowired
