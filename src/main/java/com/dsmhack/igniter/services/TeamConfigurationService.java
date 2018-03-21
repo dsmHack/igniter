@@ -31,7 +31,8 @@ public class TeamConfigurationService {
         this.integrationServicesRegistry.getActiveIntegrationServices()
                 .forEach((IntegrationService integrationService) -> {
                     try {
-                        integrationService.createTeam(integrationServicesConfiguration.getCompositeName(teamName));
+                        System.out.println("creating team: " + teamName);
+                        integrationService.createTeam(teamName);
                     } catch (DataConfigurationException e) {
                         e.printStackTrace();
                     } catch (ActionNotRequiredException e) {
@@ -49,7 +50,8 @@ public class TeamConfigurationService {
             actionLogger.setIntegrationServiceName(integrationService.getIntegrationServiceName());
             actionLogger.setActionAttempted(String.format("Adding user '%s' to team '%s'",user,teamName));
             try {
-                integrationService.addUserToTeam(integrationServicesConfiguration.getCompositeName(teamName),user);
+                System.out.println("Adding User: " + user.getEmail() + " teamName: " + teamName);
+                integrationService.addUserToTeam(teamName,user);
             } catch (ActionNotRequiredException e) {
                 actionLogger.setWarning(ExceptionUtils.getStackTrace(e));
             } catch (Throwable e) {

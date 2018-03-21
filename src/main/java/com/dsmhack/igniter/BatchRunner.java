@@ -29,11 +29,12 @@ public class BatchRunner {
 
     public void onboardEveryone(String fileName) {
         System.out.println("onboard.filename: " + fileName);
-//        List<User> usersByList = userImportService.getUsersByList(fileName);
-//        for (Integer i = 0; i < integrationServicesConfiguration.getTeamNumber(); i++) {
-//            String compositeName = integrationServicesConfiguration.getCompositeName( i.toString());
-//            teamConfigurationService.createTeam(compositeName);
-//            usersByList.forEach(user ->{teamConfigurationService.addUserToTeam(compositeName,user);});
-//        }
+        List<User> usersByList = userImportService.getUsersByList(fileName);
+        for (Integer i = 1; i <= integrationServicesConfiguration.getTeamNumber(); i++) {
+            String compositeName = integrationServicesConfiguration.getCompositeName(i.toString());
+            System.out.println("compositeName: " + compositeName);
+            teamConfigurationService.createTeam(compositeName);
+            usersByList.forEach(user ->{ teamConfigurationService.addUserToTeam(compositeName, user); } );
+        }
     }
 }
