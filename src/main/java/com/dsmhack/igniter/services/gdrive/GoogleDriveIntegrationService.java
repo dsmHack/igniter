@@ -6,14 +6,13 @@ import com.dsmhack.igniter.services.IntegrationService;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
 import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
 import org.springframework.stereotype.Service;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
 
 @Service
 public class GoogleDriveIntegrationService implements IntegrationService {
     public void createTeam(String teamName) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
