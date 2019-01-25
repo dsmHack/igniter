@@ -1,19 +1,12 @@
 package com.dsmhack.igniter.steps;
 
 import com.dsmhack.igniter.models.User;
-import com.dsmhack.igniter.services.UserImportService;
-import cucumber.api.PendingException;
+import com.dsmhack.igniter.services.user.UserImportService;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
