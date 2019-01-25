@@ -7,6 +7,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TestBatchRunner extends SpringContextConfiguration {
+
+    private static final String USER_FILE_PATH = "src/test/resources/exampleUser.csv";
+
     @Autowired
     BatchRunner batchRunner;
 
@@ -15,7 +18,7 @@ public class TestBatchRunner extends SpringContextConfiguration {
 
         System.out.println("runner: " + batchRunner);
 
-        batchRunner.onboardEveryone("bleh");
+        batchRunner.onboardEveryone(USER_FILE_PATH);
 
     }
 }

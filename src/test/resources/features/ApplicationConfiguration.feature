@@ -6,6 +6,5 @@ Feature: Application Integration services are configured at runtime
 
     Examples:
       | IntegrationServiceName |
-      | googleDrive            |
       | gitHub                 |
       | slack                  |

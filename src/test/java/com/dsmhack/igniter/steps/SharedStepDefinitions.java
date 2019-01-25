@@ -4,7 +4,6 @@ import com.dsmhack.igniter.SpringContextConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationServicesRegistry;
 import com.dsmhack.igniter.services.TeamConfigurationService;
-import cucumber.api.DataTable;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -57,7 +56,9 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
 
     @Then("^The active integration services contain \"([^\"]*)\"$")
     public void theOnlyActiveIntegrationServiceIs(String integrationServiceName) throws Throwable {
-        assertTrue( integrationServicesRegistry.getActiveIntegrationServices().stream().anyMatch(integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName)));
+        assertTrue( integrationServicesRegistry.getActiveIntegrationServices().stream().anyMatch(
+            integrationService -> integrationService.getIntegrationServiceName().equals(integrationServiceName)
+        ));
     }
 
 

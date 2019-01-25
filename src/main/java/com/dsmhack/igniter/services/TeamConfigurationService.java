@@ -5,11 +5,10 @@ import com.dsmhack.igniter.models.ActionLogger;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
 import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

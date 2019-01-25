@@ -12,8 +12,9 @@ import static org.junit.Assert.*;
 
 public class TestUserImportService {
 
+    private static final String USER_FILE_PATH = "src/test/resources/exampleUser.csv";
+
     private UserImportService userImportService;
-    private String exampleUserFilePath = "src/test/resources/exampleUser.csv";
     private String invalidFilePath = "anInvalidFilePath.txt";
     private List<User> expectedUsers;
 
@@ -39,7 +40,7 @@ public class TestUserImportService {
     @Test
     public void testGetFileAsString_returnsValidFileAsString() {
         this.userImportService = new UserImportService();
-        List<String> actualFileContents = this.userImportService.getFileAsStringStream(exampleUserFilePath);
+        List<String> actualFileContents = this.userImportService.getFileAsStringStream(USER_FILE_PATH);
         assertEquals("file contents should match", "First Name,Last Name,", actualFileContents.get(0).substring(0, 21));
     }
 
@@ -48,13 +49,13 @@ public class TestUserImportService {
         this.userImportService = new UserImportService();
         List<User> users = this.userImportService.getUsersByList("anInvalidFilePath");
 
-        assert users == null;
+        assertNull(users);
     }
 
     @Test
     public void testLoadUsers_shouldReturnAListOfUsersWhenValidFilePath(){
         this.userImportService = new UserImportService();
-        List<User> actualUsers = this.userImportService.getUsersByList(exampleUserFilePath);
+        List<User> actualUsers = this.userImportService.getUsersByList(USER_FILE_PATH);
 
         assertEquals("Got matching lists of Users", expectedUsers, actualUsers);
     }
@@ -62,7 +63,7 @@ public class TestUserImportService {
     @Test
     public void testParseStringIntoUser_returnsAUser() {
         this.userImportService = new UserImportService();
-        List<String> exampleUserFile = this.userImportService.getFileAsStringStream(exampleUserFilePath);
+        List<String> exampleUserFile = this.userImportService.getFileAsStringStream(USER_FILE_PATH);
         Object[] examplesUsersFromFile = exampleUserFile.toArray();
         User user = this.userImportService.parseStringIntoUser(examplesUsersFromFile[1].toString());
 
