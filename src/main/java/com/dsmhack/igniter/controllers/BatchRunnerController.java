@@ -1,10 +1,11 @@
-package com.dsmhack.igniter.controlers;
+package com.dsmhack.igniter.controllers;
 
 import com.dsmhack.igniter.BatchRunner;
+import com.dsmhack.igniter.services.user.UserImportException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class BatchRunnerController {
@@ -16,8 +17,8 @@ public class BatchRunnerController {
         this.batchRunner = batchRunner;
     }
 
-    @RequestMapping("api/runBatch/{filename}")
-    public String runBatchWithFile(@PathVariable("filename") String filename){
+    @RequestMapping("api/runBatch")
+    public String runBatchWithFile(@RequestParam("filename") String filename) throws UserImportException {
         batchRunner.onboardEveryone(filename);
         return "success";
     }
