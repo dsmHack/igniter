@@ -3,7 +3,8 @@ package com.dsmhack.igniter;
 import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.TeamConfigurationService;
-import com.dsmhack.igniter.services.UserImportService;
+import com.dsmhack.igniter.services.user.UserImportException;
+import com.dsmhack.igniter.services.user.UserImportService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,9 @@ public class BatchRunner {
         this.integrationServicesConfiguration = integrationServicesConfiguration;
     }
 
-    public void onboardEveryone(String fileName) {
+    public void onboardEveryone(String fileName) throws UserImportException {
         System.out.println("onboard.filename: " + fileName);
-        List<User> usersByList = userImportService.getUsersByList(fileName);
+        List<User> usersByList = userImportService.getUsers(fileName);
         for (Integer i = 1; i <= integrationServicesConfiguration.getTeamNumber(); i++) {
             String compositeName = integrationServicesConfiguration.getCompositeName(i.toString());
             System.out.println("compositeName: " + compositeName);
