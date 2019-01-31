@@ -4,6 +4,8 @@ import com.dsmhack.igniter.models.User;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 public class EventBriteUserImportServiceTest {
 
     private static final String USER_FILE_PATH = "src/test/resources/exampleUser.csv";
-    private static final String INVALID_FILE_PATH = "anInvalidFilePath.txt";
 
     private EventBriteUserImportService userImportService;
     private List<User> expectedUsers;
@@ -26,21 +27,15 @@ public class EventBriteUserImportServiceTest {
         userImportService = new EventBriteUserImportService();
     }
 
-
-    @Test(expected = UserImportException.class)
-    public void testLoadUsers_shouldReturnANullWhenInvalidFilePath() throws UserImportException {
-        this.userImportService.getUsers(INVALID_FILE_PATH);
-    }
-
     @Test
-    public void testLoadUsers_shouldReturnAListOfUsersWhenValidFilePath() throws UserImportException {
-        List<User> actualUsers = this.userImportService.getUsers(USER_FILE_PATH);
+    public void testLoadUsers_shouldReturnAListOfUsersWhenValidFilePath() throws UserImportException, FileNotFoundException {
+        List<User> actualUsers = this.userImportService.getUsers(new FileReader(USER_FILE_PATH));
         assertEquals("Got matching lists of Users", expectedUsers, actualUsers);
     }
 
     @Test
-    public void testParseStringIntoUser_returnsAUser() throws UserImportException {
-        User user = this.userImportService.getUsers(USER_FILE_PATH).get(0);
+    public void testParseStringIntoUser_returnsAUser() throws UserImportException, FileNotFoundException {
+        User user = this.userImportService.getUsers(new FileReader(USER_FILE_PATH)).get(0);
 
         assertEquals("john", user.getFirstName());
         assertEquals("doe", user.getLastName());

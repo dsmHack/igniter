@@ -7,6 +7,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TestBatchRunner extends SpringContextConfiguration {
 
@@ -17,11 +20,11 @@ public class TestBatchRunner extends SpringContextConfiguration {
 
     @Test
     @Ignore
-    public void testOnboardSlack_createsStuff() throws UserImportException {
+    public void testOnboardSlack_createsStuff() throws UserImportException, FileNotFoundException {
 
         System.out.println("runner: " + batchRunner);
 
-        batchRunner.onboardEveryone(USER_FILE_PATH);
+        batchRunner.onboardEveryone(new FileReader(USER_FILE_PATH));
 
     }
 }

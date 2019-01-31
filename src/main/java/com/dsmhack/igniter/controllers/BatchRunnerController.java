@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+
 @Controller
 public class BatchRunnerController {
 
@@ -18,8 +21,8 @@ public class BatchRunnerController {
     }
 
     @RequestMapping("api/runBatch")
-    public String runBatchWithFile(@RequestParam("filename") String filename) throws UserImportException {
-        batchRunner.onboardEveryone(filename);
+    public String runBatchWithFile(@RequestParam("filename") String filename) throws UserImportException, FileNotFoundException {
+        batchRunner.onboardEveryone(new FileReader(filename));
         return "success";
     }
 

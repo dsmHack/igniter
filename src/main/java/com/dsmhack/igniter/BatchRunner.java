@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Reader;
 import java.util.List;
 
 @Getter
@@ -27,9 +28,8 @@ public class BatchRunner {
         this.igniterProperties = igniterProperties;
     }
 
-    public void onboardEveryone(String fileName) throws UserImportException {
-        System.out.println("onboard.filename: " + fileName);
-        List<User> usersByList = userImportService.getUsers(fileName);
+    public void onboardEveryone(Reader reader) throws UserImportException {
+        List<User> usersByList = userImportService.getUsers(reader);
         for (int i = 1; i <= igniterProperties.getTeamNumber(); i++) {
             String compositeName = igniterProperties.getCompositeName(i);
             System.out.println("compositeName: " + compositeName);
