@@ -5,14 +5,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 @Service
-public class EventBriteUserImportService implements UserImportService {
+public class EventBriteUserImportService extends AbstractCsvUserImportService {
 
   enum Headers {
     ORDER_ID,
@@ -55,28 +49,17 @@ public class EventBriteUserImportService implements UserImportService {
     COMPANY
   }
 
-  @Override
-  public List<User> getUsers(String filePath) throws UserImportException {
-    return StreamSupport.stream(getRecords(filePath).spliterator(), false)
-        .skip(1)
-        .map(this::createUser)
-        .collect(Collectors.toList());
+  public EventBriteUserImportService() {
+    super(CSVFormat.EXCEL.withHeader(Headers.class));
   }
 
-  private User createUser(CSVRecord record) {
+  @Override
+  protected User createUser(CSVRecord record) {
     User user = new User();
     user.setFirstName(record.get(Headers.FIRST_NAME));
     user.setLastName(record.get(Headers.LAST_NAME));
     user.setEmail(record.get(Headers.EMAIL));
     user.setGithubUsername(record.get(Headers.GITHUB_USERNAME));
     return user;
-  }
-
-  private Iterable<CSVRecord> getRecords(String filePath) throws UserImportException {
-    try {
-      return CSVFormat.EXCEL.withHeader(Headers.class).parse(new FileReader(filePath));
-    } catch (IOException e) {
-      throw new UserImportException("Unable to import users.", e);
-    }
   }
 }
