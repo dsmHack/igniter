@@ -1,6 +1,6 @@
 package com.dsmhack.igniter.services;
 
-import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
+import com.dsmhack.igniter.IgniterProperties;
 import com.dsmhack.igniter.models.ActionLogger;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
@@ -16,12 +16,12 @@ import java.util.List;
 public class TeamConfigurationService {
 
     private final IntegrationServicesRegistry integrationServicesRegistry;
-    private final IntegrationServicesConfiguration integrationServicesConfiguration;
+    private final IgniterProperties igniterProperties;
 
     @Autowired
-    public TeamConfigurationService(IntegrationServicesRegistry integrationServicesRegistry, IntegrationServicesConfiguration integrationServicesConfiguration) {
+    public TeamConfigurationService(IntegrationServicesRegistry integrationServicesRegistry, IgniterProperties igniterProperties) {
         this.integrationServicesRegistry = integrationServicesRegistry;
-        this.integrationServicesConfiguration = integrationServicesConfiguration;
+        this.igniterProperties = igniterProperties;
     }
 
 

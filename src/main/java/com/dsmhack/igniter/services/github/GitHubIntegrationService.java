@@ -1,12 +1,11 @@
 package com.dsmhack.igniter.services.github;
 
-import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
+import com.dsmhack.igniter.IgniterProperties;
 import com.dsmhack.igniter.models.TeamValidation;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
 import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.kohsuke.github.*;
@@ -15,24 +14,26 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class GitHubIntegrationService implements IntegrationService {
 
-    private final IntegrationServicesConfiguration integrationServicesConfiguration;
+    private final IgniterProperties igniterProperties;
+    private final GitHubConfig gitHubConfig;
 
-    final ObjectMapper objectMapper;
     private GitHubClient gitHubClient;
-    private GitHubConfig gitHubConfig;
     private GitHub gitHubService;
     private GHOrganization organization;
 
-
     @Autowired
-    public GitHubIntegrationService(ObjectMapper objectMapper, IntegrationServicesConfiguration integrationServicesConfiguration) {
-        this.objectMapper = objectMapper;
-        this.integrationServicesConfiguration = integrationServicesConfiguration;
+    public GitHubIntegrationService(IgniterProperties igniterProperties,
+                                    GitHubConfig gitHubConfig) {
+        this.igniterProperties = igniterProperties;
+        this.gitHubConfig = gitHubConfig;
     }
 
     @Override
@@ -42,11 +43,9 @@ public class GitHubIntegrationService implements IntegrationService {
 
     @Override
     public void createTeam(String teamName) {
-        GHRepository ghRepository;
-        GHTeam team;
         try {
-            ghRepository = buildOrGetRepository(teamName);
-            team = buildOrGetTeam(teamName, ghRepository);
+            GHRepository ghRepository = buildOrGetRepository(teamName);
+            GHTeam team = buildOrGetTeam(teamName, ghRepository);
             team.add(ghRepository, GHOrganization.Permission.PUSH);
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,17 +67,20 @@ public class GitHubIntegrationService implements IntegrationService {
 
 
     private boolean isUserMember(String teamName, User user) throws DataConfigurationException, IOException {
-        GHTeam teamByName = null;
+        GHTeam teamByName;
         try {
             teamByName = getTeamByName(teamName);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new DataConfigurationException(String.format("Error in fetching team %s while checking for user '%s' membership ", user.getGithubUsername(), teamName), e);
         }
         return getUserForTeam(user, teamByName) != null;
     }
 
     private GHUser getUserForTeam(User user, GHTeam team) throws IOException {
-        return team.getMembers().stream().filter(u -> u.getLogin().equals(user.getGithubUsername())).findFirst().orElse(null);
+        return team.getMembers().stream()
+            .filter(u -> u.getLogin().equals(user.getGithubUsername()))
+            .findFirst()
+            .orElse(null);
     }
 
 
@@ -135,7 +137,9 @@ public class GitHubIntegrationService implements IntegrationService {
     private GHRepository buildOrGetRepository(String teamName) throws IOException {
         GHRepository repository = getRepositoryIfExists(teamName);
         if (repository == null) {
-            repository = organization.createRepository(teamName).description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'").create();
+            repository = organization.createRepository(teamName)
+                .description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'")
+                .create();
         }
         return repository;
     }
@@ -146,10 +150,9 @@ public class GitHubIntegrationService implements IntegrationService {
 
     @PostConstruct
     public void configure() throws IOException {
-        if(!integrationServicesConfiguration.getActiveIntegrations().contains(this.getIntegrationServiceName())){
+        if(!igniterProperties.isActiveIntegration(this.getIntegrationServiceName())){
             return;
         }
-        this.gitHubConfig = integrationServicesConfiguration.getKeyContent("git-hub-credentials.json", GitHubConfig.class);
         gitHubService = new GitHubBuilder().withOAuthToken(this.gitHubConfig.getOAuthKey(), this.gitHubConfig.getOrgName()).build();
         organization = gitHubService.getOrganization(this.gitHubConfig.getOrgName());
         gitHubClient = new GitHubClient();

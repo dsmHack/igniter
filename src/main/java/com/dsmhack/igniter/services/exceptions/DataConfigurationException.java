@@ -1,8 +1,6 @@
 package com.dsmhack.igniter.services.exceptions;
 
-import com.github.seratch.jslack.api.methods.SlackApiException;
-
-public class DataConfigurationException extends Throwable {
+public class DataConfigurationException extends Exception {
 
     public DataConfigurationException(String message) {
         super(message);
