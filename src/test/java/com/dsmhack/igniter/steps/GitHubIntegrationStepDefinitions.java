@@ -1,18 +1,13 @@
 package com.dsmhack.igniter.steps;
 
-import com.dsmhack.igniter.SpringContextConfiguration;
-import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
-import cucumber.api.PendingException;
-import cucumber.api.java.bs.A;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
+import com.dsmhack.igniter.IgniterProperties;
 import cucumber.api.java.en.Then;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GitHubIntegrationStepDefinitions  {
 
     @Autowired
-    IntegrationServicesConfiguration integrationServicesConfiguration;
+    IgniterProperties igniterProperties;
 
 
     @Then("^The gitGub repo of \"([^\"]*)\" exists$")

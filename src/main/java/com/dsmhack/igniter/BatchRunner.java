@@ -1,6 +1,5 @@
 package com.dsmhack.igniter;
 
-import com.dsmhack.igniter.configuration.IntegrationServicesConfiguration;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.TeamConfigurationService;
 import com.dsmhack.igniter.services.user.UserImportException;
@@ -18,21 +17,21 @@ import java.util.List;
 public class BatchRunner {
 
     private final UserImportService userImportService;
-    private final IntegrationServicesConfiguration integrationServicesConfiguration;
+    private final IgniterProperties igniterProperties;
     private final TeamConfigurationService teamConfigurationService;
 
     @Autowired
-    public BatchRunner(TeamConfigurationService teamConfigurationService, UserImportService userImportService, IntegrationServicesConfiguration integrationServicesConfiguration) {
+    public BatchRunner(TeamConfigurationService teamConfigurationService, UserImportService userImportService, IgniterProperties igniterProperties) {
         this.teamConfigurationService = teamConfigurationService;
         this.userImportService = userImportService;
-        this.integrationServicesConfiguration = integrationServicesConfiguration;
+        this.igniterProperties = igniterProperties;
     }
 
     public void onboardEveryone(String fileName) throws UserImportException {
         System.out.println("onboard.filename: " + fileName);
         List<User> usersByList = userImportService.getUsers(fileName);
-        for (Integer i = 1; i <= integrationServicesConfiguration.getTeamNumber(); i++) {
-            String compositeName = integrationServicesConfiguration.getCompositeName(i.toString());
+        for (int i = 1; i <= igniterProperties.getTeamNumber(); i++) {
+            String compositeName = igniterProperties.getCompositeName(i);
             System.out.println("compositeName: " + compositeName);
             teamConfigurationService.createTeam(compositeName);
             usersByList.forEach(user ->{ teamConfigurationService.addUserToTeam(compositeName, user); } );
