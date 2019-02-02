@@ -6,7 +6,6 @@ import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
 import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.kohsuke.github.*;
@@ -15,24 +14,26 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class GitHubIntegrationService implements IntegrationService {
 
     private final IntegrationServicesConfiguration integrationServicesConfiguration;
+    private final GitHubConfig gitHubConfig;
 
-    final ObjectMapper objectMapper;
     private GitHubClient gitHubClient;
-    private GitHubConfig gitHubConfig;
     private GitHub gitHubService;
     private GHOrganization organization;
 
-
     @Autowired
-    public GitHubIntegrationService(ObjectMapper objectMapper, IntegrationServicesConfiguration integrationServicesConfiguration) {
-        this.objectMapper = objectMapper;
+    public GitHubIntegrationService(IntegrationServicesConfiguration integrationServicesConfiguration,
+                                    GitHubConfig gitHubConfig) {
         this.integrationServicesConfiguration = integrationServicesConfiguration;
+        this.gitHubConfig = gitHubConfig;
     }
 
     @Override
@@ -78,7 +79,10 @@ public class GitHubIntegrationService implements IntegrationService {
     }
 
     private GHUser getUserForTeam(User user, GHTeam team) throws IOException {
-        return team.getMembers().stream().filter(u -> u.getLogin().equals(user.getGithubUsername())).findFirst().orElse(null);
+        return team.getMembers().stream()
+            .filter(u -> u.getLogin().equals(user.getGithubUsername()))
+            .findFirst()
+            .orElse(null);
     }
 
 
@@ -135,7 +139,9 @@ public class GitHubIntegrationService implements IntegrationService {
     private GHRepository buildOrGetRepository(String teamName) throws IOException {
         GHRepository repository = getRepositoryIfExists(teamName);
         if (repository == null) {
-            repository = organization.createRepository(teamName).description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'").create();
+            repository = organization.createRepository(teamName)
+                .description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'")
+                .create();
         }
         return repository;
     }
@@ -149,7 +155,6 @@ public class GitHubIntegrationService implements IntegrationService {
         if(!integrationServicesConfiguration.getActiveIntegrations().contains(this.getIntegrationServiceName())){
             return;
         }
-        this.gitHubConfig = integrationServicesConfiguration.getKeyContent("git-hub-credentials.json", GitHubConfig.class);
         gitHubService = new GitHubBuilder().withOAuthToken(this.gitHubConfig.getOAuthKey(), this.gitHubConfig.getOrgName()).build();
         organization = gitHubService.getOrganization(this.gitHubConfig.getOrgName());
         gitHubClient = new GitHubClient();

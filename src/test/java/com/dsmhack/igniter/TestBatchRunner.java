@@ -1,6 +1,7 @@
 package com.dsmhack.igniter;
 
 import com.dsmhack.igniter.services.user.UserImportException;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ public class TestBatchRunner extends SpringContextConfiguration {
     BatchRunner batchRunner;
 
     @Test
+    @Ignore
     public void testOnboardSlack_createsStuff() throws UserImportException {
 
         System.out.println("runner: " + batchRunner);
