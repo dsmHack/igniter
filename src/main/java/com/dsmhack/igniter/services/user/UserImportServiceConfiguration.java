@@ -11,8 +11,7 @@ import java.util.function.Supplier;
 @Configuration
 public class UserImportServiceConfiguration {
 
-  private static Map<UserFormat, Supplier<UserImportService>> MAP = createMap();
-
+  private final static Map<UserFormat, Supplier<UserImportService>> MAP = createMap();
 
   private final UserFormat userFormat;
 

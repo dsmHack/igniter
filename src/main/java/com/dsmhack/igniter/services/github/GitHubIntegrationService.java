@@ -23,7 +23,7 @@ import java.util.Map;
 public class GitHubIntegrationService implements IntegrationService {
 
   private final IgniterProperties igniterProperties;
-  private final GitHubConfig gitHubConfig;
+  private final GitHubProperties gitHubProperties;
 
   private GitHubClient gitHubClient;
   private GitHub gitHubService;
@@ -31,9 +31,9 @@ public class GitHubIntegrationService implements IntegrationService {
 
   @Autowired
   public GitHubIntegrationService(IgniterProperties igniterProperties,
-                                  GitHubConfig gitHubConfig) {
+                                  GitHubProperties gitHubProperties) {
     this.igniterProperties = igniterProperties;
-    this.gitHubConfig = gitHubConfig;
+    this.gitHubProperties = gitHubProperties;
   }
 
   @Override
@@ -53,7 +53,6 @@ public class GitHubIntegrationService implements IntegrationService {
       e.printStackTrace();
     }
   }
-
 
   @Override
   public TeamValidation validateTeam(String team) {
@@ -89,7 +88,6 @@ public class GitHubIntegrationService implements IntegrationService {
         .orElse(null);
   }
 
-
   @Override
   public void addUserToTeam(String teamName,
                             User user) throws ActionNotRequiredException, DataConfigurationException, IOException {
@@ -118,7 +116,7 @@ public class GitHubIntegrationService implements IntegrationService {
   private GHTeam buildOrGetTeam(String teamName, GHRepository ghRepository) throws IOException {
     GHTeam team = getTeam(teamName);
     if (team == null) {
-      createTeam(gitHubConfig.getOrgName(), teamName, Collections.singletonList(ghRepository.getFullName()));
+      createTeam(gitHubProperties.getOrgName(), teamName, Collections.singletonList(ghRepository.getFullName()));
       team = getTeam(teamName);
     }
     return team;
@@ -146,12 +144,11 @@ public class GitHubIntegrationService implements IntegrationService {
     return (Team) gitHubClient.post(uri.toString(), params, Team.class);
   }
 
-
   private GHRepository buildOrGetRepository(String teamName) throws IOException {
     GHRepository repository = getRepositoryIfExists(teamName);
     if (repository == null) {
       repository = organization.createRepository(teamName)
-          .description("This is the repo for the '" + gitHubConfig.getPrefix() + "' event for the team:'" + teamName + "'")
+          .description("This is the repo for the '" + gitHubProperties.getPrefix() + "' event for the team:'" + teamName + "'")
           .create();
     }
     return repository;
@@ -164,12 +161,12 @@ public class GitHubIntegrationService implements IntegrationService {
   @PostConstruct
   public void configure() throws IOException {
     if (igniterProperties.isActiveIntegration(this.getIntegrationServiceName())) {
-      gitHubService = new GitHubBuilder().withOAuthToken(this.gitHubConfig.getOAuthKey(),
-                                                         this.gitHubConfig.getOrgName()).build();
-      organization = gitHubService.getOrganization(this.gitHubConfig.getOrgName());
+      gitHubService = new GitHubBuilder()
+          .withOAuthToken(this.gitHubProperties.getOAuthKey(), this.gitHubProperties.getOrgName())
+          .build();
+      organization = gitHubService.getOrganization(this.gitHubProperties.getOrgName());
       gitHubClient = new GitHubClient();
-      gitHubClient.setOAuth2Token(this.gitHubConfig.getOAuthKey());
-
+      gitHubClient.setOAuth2Token(this.gitHubProperties.getOAuthKey());
     }
   }
 

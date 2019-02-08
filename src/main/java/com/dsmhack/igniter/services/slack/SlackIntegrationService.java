@@ -30,15 +30,15 @@ import static java.lang.String.format;
 public class SlackIntegrationService implements IntegrationService {
 
   private final IgniterProperties igniterProperties;
-  private final SlackConfig slackConfig;
+  private final SlackProperties slackProperties;
 
   private Slack slack;
 
   @Autowired
   public SlackIntegrationService(IgniterProperties igniterProperties,
-                                 SlackConfig slackConfig) {
+                                 SlackProperties slackProperties) {
     this.igniterProperties = igniterProperties;
-    this.slackConfig = slackConfig;
+    this.slackProperties = slackProperties;
   }
 
   @Override
@@ -54,7 +54,7 @@ public class SlackIntegrationService implements IntegrationService {
         throw new ActionNotRequiredException("Group with name'%s' already exists in slack");
       }
       groupsCreateResponse = slack.methods()
-          .groupsCreate(GroupsCreateRequest.builder().name(teamName).token(slackConfig.getOAuthKey()).build());
+          .groupsCreate(GroupsCreateRequest.builder().name(teamName).token(slackProperties.getOAuthKey()).build());
     } catch (Exception e) {
       throw new DataConfigurationException(String.format("Failed to create slack group of name:'%s'", teamName), e);
     }
@@ -63,8 +63,6 @@ public class SlackIntegrationService implements IntegrationService {
                                                          teamName,
                                                          groupsCreateResponse.getError()));
     }
-
-
   }
 
   @Override
@@ -93,7 +91,7 @@ public class SlackIntegrationService implements IntegrationService {
       com.github.seratch.jslack.api.model.User userLookup = getUserByEmail(user);
       GroupsInviteRequest groupsInviteRequest = GroupsInviteRequest.builder()
           .channel(group.getName())
-          .token(slackConfig.getOAuthKey())
+          .token(slackProperties.getOAuthKey())
           .user(userLookup.getId())
           .build();
       GroupsInviteResponse groupsInviteResponse = slack.methods().groupsInvite(groupsInviteRequest);
@@ -112,7 +110,7 @@ public class SlackIntegrationService implements IntegrationService {
 
   private com.github.seratch.jslack.api.model.User getUserByEmail(User user) throws DataConfigurationException, IOException {
     UsersLookupByEmailRequest userLookup = UsersLookupByEmailRequest.builder()
-        .token(slackConfig.getOAuthKey())
+        .token(slackProperties.getOAuthKey())
         .email(user.getEmail())
         .build();
     try {
@@ -138,7 +136,7 @@ public class SlackIntegrationService implements IntegrationService {
   }
 
   private Group getGroupIfExists(String compositeName) throws IOException, SlackApiException {
-    GroupsListRequest groupsListRequest = GroupsListRequest.builder().token(slackConfig.getOAuthKey()).build();
+    GroupsListRequest groupsListRequest = GroupsListRequest.builder().token(slackProperties.getOAuthKey()).build();
     GroupsListResponse groupsListResponse = slack.methods().groupsList(groupsListRequest);
     return groupsListResponse.getGroups()
         .stream()
@@ -158,7 +156,7 @@ public class SlackIntegrationService implements IntegrationService {
           .groupsKick(GroupsKickRequest.builder()
                           .channel(group.getId())
                           .user(userByEmail.getId())
-                          .token(slackConfig.getOAuthKey())
+                          .token(slackProperties.getOAuthKey())
                           .build());
     } catch (SlackApiException e) {
       throw new DataConfigurationException(format("Error removing user '%s' from team '%s'", user.getEmail(), teamName),
