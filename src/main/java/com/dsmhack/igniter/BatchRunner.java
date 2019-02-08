@@ -2,39 +2,23 @@ package com.dsmhack.igniter;
 
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.TeamConfigurationService;
-import com.dsmhack.igniter.services.user.UserImportException;
-import com.dsmhack.igniter.services.user.UserImportService;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Reader;
 import java.util.List;
 
-@Getter
-@Setter
 @Service
 public class BatchRunner {
 
-    private final UserImportService userImportService;
-    private final IgniterProperties igniterProperties;
-    private final TeamConfigurationService teamConfigurationService;
+  private final TeamConfigurationService teamConfigurationService;
 
-    @Autowired
-    public BatchRunner(TeamConfigurationService teamConfigurationService, UserImportService userImportService, IgniterProperties igniterProperties) {
-        this.teamConfigurationService = teamConfigurationService;
-        this.userImportService = userImportService;
-        this.igniterProperties = igniterProperties;
-    }
+  @Autowired
+  public BatchRunner(TeamConfigurationService teamConfigurationService) {
+    this.teamConfigurationService = teamConfigurationService;
+  }
 
-    public void onboardEveryone(Reader reader) throws UserImportException {
-        List<User> usersByList = userImportService.getUsers(reader);
-        for (int i = 1; i <= igniterProperties.getTeamNumber(); i++) {
-            String compositeName = igniterProperties.getCompositeName(i);
-            System.out.println("compositeName: " + compositeName);
-            teamConfigurationService.createTeam(compositeName);
-            usersByList.forEach(user ->{ teamConfigurationService.addUserToTeam(compositeName, user); } );
-        }
-    }
+  public void onboardEveryone(String teamPrefix, int numberOfTeams, List<User> users) {
+    teamConfigurationService.createTeams(teamPrefix, numberOfTeams)
+        .forEach(teamName -> teamConfigurationService.addUsersToTeam(teamName, users));
+  }
 }

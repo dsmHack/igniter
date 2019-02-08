@@ -14,12 +14,6 @@ import java.util.List;
 public class IgniterProperties {
 
   private List<String> activeIntegrations;
-  private String teamPrefix;
-  private Integer teamNumber;
-
-  public String getCompositeName(int teamId) {
-    return this.teamPrefix + teamId;
-  }
 
   public boolean isActiveIntegration(String name) {
     return this.activeIntegrations.contains(name);

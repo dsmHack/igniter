@@ -10,27 +10,25 @@ import java.util.stream.Collectors;
 @Service
 public class IntegrationServicesRegistry {
 
-    private IgniterProperties igniterProperties;
+  private final IgniterProperties igniterProperties;
+  private final List<IntegrationService> availableServices;
 
-    private final List<IntegrationService> availableServices;
+  @Autowired
+  public IntegrationServicesRegistry(IgniterProperties igniterProperties, List<IntegrationService> availableServices) {
+    this.igniterProperties = igniterProperties;
+    this.availableServices = availableServices;
+  }
 
-    @Autowired
-    public IntegrationServicesRegistry(IgniterProperties igniterProperties, List<IntegrationService> availableServices) {
-        this.igniterProperties = igniterProperties;
-        this.availableServices = availableServices;
+  public List<IntegrationService> getActiveIntegrationServices() {
+    return this.availableServices.stream()
+        .filter(integrationService -> igniterProperties.isActiveIntegration(integrationService.getIntegrationServiceName()))
+        .collect(Collectors.toList());
+  }
+
+  public void activateIntegrationService(String integrationServiceName) {
+    if (!igniterProperties.isActiveIntegration(integrationServiceName)) {
+      igniterProperties.getActiveIntegrations().add(integrationServiceName);
     }
-
-    public List<IntegrationService> getActiveIntegrationServices() {
-        return this.availableServices.stream()
-                .filter(integrationService -> igniterProperties.isActiveIntegration(integrationService.getIntegrationServiceName()))
-                .collect(Collectors.toList());
-    }
-
-    public void activateIntegrationService(String integrationServiceName) {
-        if (!igniterProperties.isActiveIntegration(integrationServiceName)) {
-            igniterProperties.getActiveIntegrations().add(integrationServiceName);
-        }
-    }
-
+  }
 
 }
