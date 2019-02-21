@@ -3,8 +3,6 @@
 igniter.user.format=EVENTBRITE
 
 igniter.active-integrations=gitHub,slack
-igniter.team-prefix=2019_team
-igniter.team-number=2
 
 igniter.github.enabled=
 igniter.github.oauth-key=

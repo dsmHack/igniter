@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
   <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">dsmHack Igniter</title>
 
@@ -30,8 +32,8 @@
 
   <div class="collapse navbar-collapse" id="igniterNavbar">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/">User Import <span class="sr-only">(current)</span></a>
+      <li class="nav-item" th:classappend="${#httpServletRequest.requestURI == '/users' ? 'active':''}">
+        <a class="nav-link" th:href="@{/users}">Users</a>
       </li>
     </ul>
   </div>
