@@ -20,8 +20,12 @@ public class TeamConfigurationService {
 
   public List<String> createTeams(String teamPrefix, int numberOfTeams) {
     return IntStream.rangeClosed(1, numberOfTeams)
-        .mapToObj(teamId -> createTeam(teamPrefix + teamId))
+        .mapToObj(teamId -> createTeam(getTeamName(teamPrefix, teamId)))
         .collect(Collectors.toList());
+  }
+
+  private String getTeamName(String teamPrefix, int teamId) {
+    return String.format("%s%02d", teamPrefix, teamId);
   }
 
   public List<String> createTeams(List<String> teams) {

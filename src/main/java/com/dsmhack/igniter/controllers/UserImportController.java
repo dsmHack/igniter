@@ -73,6 +73,6 @@ public class UserImportController {
   }
 
   private String getTeamPrefix() {
-    return LocalDate.now().getYear() + "_team";
+    return LocalDate.now().getYear() + "-team-";
   }
 }
