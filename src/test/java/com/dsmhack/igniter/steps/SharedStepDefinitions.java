@@ -26,10 +26,11 @@ public class SharedStepDefinitions extends SpringContextConfiguration {
     public void theAdminCreatesTheTeam(String teamName) throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         teamConfigurationService.createTeam(teamName);
-        User user = new User();
-        user.setGithubUsername("Kickercost");
-        user.setEmail("joshua@kickercost.com");
-        teamConfigurationService.addUserToTeam(teamName,user);
+        User user = User.builder()
+            .githubUsername("Kickercost")
+            .slackEmail("joshua@kickercost.com")
+            .build();
+        teamConfigurationService.addUserToTeam(teamName, user);
     }
 
     @When("^The following user is added$")

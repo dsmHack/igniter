@@ -54,7 +54,7 @@ public class TeamConfigurationService {
       actionLogger.setIntegrationServiceName(integrationService.getIntegrationServiceName());
       actionLogger.setActionAttempted(String.format("Adding user '%s' to team '%s'", user, teamName));
       try {
-        System.out.println("Adding User: " + user.getEmail() + " teamName: " + teamName);
+        System.out.println("Adding User: " + user.getFirstName() + " " + user.getLastName() + " teamName: " + teamName);
         integrationService.addUserToTeam(teamName, user);
       } catch (ActionNotRequiredException e) {
         actionLogger.setWarning(ExceptionUtils.getStackTrace(e));

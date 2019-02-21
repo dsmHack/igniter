@@ -97,13 +97,13 @@ public class SlackIntegrationService implements IntegrationService {
       GroupsInviteResponse groupsInviteResponse = slack.methods().groupsInvite(groupsInviteRequest);
       if (!groupsInviteResponse.isOk()) {
         throw new DataConfigurationException(format("Error adding user '%s' to team '%s'. Error was:%s",
-                                                    user.getEmail(),
+                                                    user.getSlackEmail(),
                                                     compositeName,
                                                     groupsInviteResponse.getError()));
       }
     } catch (SlackApiException e) {
       throw new DataConfigurationException(format("Error adding user '%s' to team '%s'",
-                                                  user.getEmail(),
+                                                  user.getSlackEmail(),
                                                   compositeName), e);
     }
   }
@@ -111,18 +111,18 @@ public class SlackIntegrationService implements IntegrationService {
   private com.github.seratch.jslack.api.model.User getUserByEmail(User user) throws DataConfigurationException, IOException {
     UsersLookupByEmailRequest userLookup = UsersLookupByEmailRequest.builder()
         .token(slackProperties.getOAuthKey())
-        .email(user.getEmail())
+        .email(user.getSlackEmail())
         .build();
     try {
       UsersLookupByEmailResponse usersLookupByEmailResponse = slack.methods().usersLookupByEmail(userLookup);
       if (!usersLookupByEmailResponse.isOk()) {
         throw new DataConfigurationException(String.format("Error Fetching slack user with email:'%s'. Error: %s",
-                                                           user.getEmail(),
+                                                           user.getSlackEmail(),
                                                            usersLookupByEmailResponse.getError()));
       }
       return usersLookupByEmailResponse.getUser();
     } catch (SlackApiException e) {
-      throw new DataConfigurationException(format("Error fetching user for email: %s", user.getEmail()), e);
+      throw new DataConfigurationException(format("Error fetching user for email: %s", user.getSlackEmail()), e);
     }
 
   }
@@ -159,7 +159,7 @@ public class SlackIntegrationService implements IntegrationService {
                           .token(slackProperties.getOAuthKey())
                           .build());
     } catch (SlackApiException e) {
-      throw new DataConfigurationException(format("Error removing user '%s' from team '%s'", user.getEmail(), teamName),
+      throw new DataConfigurationException(format("Error removing user '%s' from team '%s'", user.getSlackEmail(), teamName),
                                            e);
     }
   }

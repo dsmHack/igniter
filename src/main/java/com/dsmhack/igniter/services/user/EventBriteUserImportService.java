@@ -4,6 +4,7 @@ import com.dsmhack.igniter.models.User;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class EventBriteUserImportService extends AbstractCsvUserImportService {
@@ -55,11 +56,29 @@ public class EventBriteUserImportService extends AbstractCsvUserImportService {
 
   @Override
   protected User createUser(CSVRecord record) {
-    User user = new User();
-    user.setFirstName(record.get(Headers.FIRST_NAME));
-    user.setLastName(record.get(Headers.LAST_NAME));
-    user.setEmail(record.get(Headers.EMAIL));
-    user.setGithubUsername(record.get(Headers.GITHUB_USERNAME));
-    return user;
+    return User.builder()
+        .firstName(record.get(Headers.FIRST_NAME))
+        .lastName(record.get(Headers.LAST_NAME))
+        .githubUsername(record.get(Headers.GITHUB_USERNAME))
+        .slackEmail(record.get(Headers.SLACK_INVITE_EMAIL))
+        .build();
+  }
+
+  private String getSlackEmail(CSVRecord record) {
+    String email = record.get(Headers.SLACK_INVITE_EMAIL);
+
+    if (StringUtils.isEmpty(email)) {
+      email = record.get(Headers.SLACK_EMAIL);
+    }
+
+    if (StringUtils.isEmpty(email)) {
+      email = record.get(Headers.EVENT_EMAIL);
+    }
+
+    if (StringUtils.isEmpty(email)) {
+      email = record.get(Headers.EMAIL);
+    }
+
+    return email;
   }
 }

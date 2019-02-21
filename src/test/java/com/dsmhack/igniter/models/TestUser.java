@@ -6,22 +6,23 @@ import static org.junit.Assert.assertEquals;
 
 public class TestUser {
 
+  @Test
+  public void testUserImportService_constructor() {
+    String firstName = "aFirstName";
+    String lastName = "aLastName";
+    String email = "aEmail";
+    String githubUsername = "aGithubUser";
+    User actualUser = User.builder()
+        .firstName(firstName)
+        .lastName(lastName)
+        .slackEmail(email)
+        .githubUsername(githubUsername)
+        .build();
 
-
-    @Test
-    public void testUserImportService_constructor() {
-        String firstName = "aFirstName";
-        String lastName = "aLastName";
-        String email = "aEmail";
-        String githubUsername = "aGithubUser";
-        User actualUser = new User(firstName, lastName, email, githubUsername);
-
-
-        assertEquals(actualUser.getFirstName(), firstName);
-        assertEquals(actualUser.getLastName(), lastName);
-        assertEquals(actualUser.getEmail(), email);
-        assertEquals(actualUser.getGithubUsername(), githubUsername);
-
-    }
+    assertEquals(actualUser.getFirstName(), firstName);
+    assertEquals(actualUser.getLastName(), lastName);
+    assertEquals(actualUser.getSlackEmail(), email);
+    assertEquals(actualUser.getGithubUsername(), githubUsername);
+  }
 
 }

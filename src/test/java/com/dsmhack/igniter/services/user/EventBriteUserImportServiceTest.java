@@ -21,9 +21,30 @@ public class EventBriteUserImportServiceTest {
     @Before
     public void before() {
         expectedUsers = new ArrayList<User>();
-        expectedUsers.add(new User("john", "doe", "aEmail", "aGithubUserName"));
-        expectedUsers.add(new User("Stewie", "Rolek", "stewie@email.com", "stewieGithub"));
-        expectedUsers.add(new User("LilSquiggle", "Rolek", "lilsquiggle@email.com", "lilsquiggleGithub"));
+        expectedUsers.add(
+            User.builder()
+                .firstName("john")
+                .lastName("doe")
+                .slackEmail("aEmail")
+                .githubUsername("aGithubUserName")
+                .build()
+        );
+        expectedUsers.add(
+            User.builder()
+                .firstName("Stewie")
+                .lastName("Rolek")
+                .slackEmail("stewie@email.com")
+                .githubUsername("stewieGithub")
+                .build()
+        );
+        expectedUsers.add(
+            User.builder()
+                .firstName("LilSquiggle")
+                .lastName("Rolek")
+                .slackEmail("lilsquiggle@email.com")
+                .githubUsername("lilsquiggleGithub")
+                .build()
+        );
         userImportService = new EventBriteUserImportService();
     }
 
@@ -39,7 +60,7 @@ public class EventBriteUserImportServiceTest {
 
         assertEquals("john", user.getFirstName());
         assertEquals("doe", user.getLastName());
-        assertEquals("aEmail", user.getEmail());
+        assertEquals("aEmail", user.getSlackEmail());
         assertEquals("aGithubUserName", user.getGithubUsername());
     }
 
