@@ -9,17 +9,13 @@ import com.dsmhack.igniter.services.exceptions.IntegrationServiceException;
 import com.github.seratch.jslack.Slack;
 import com.github.seratch.jslack.api.methods.SlackApiException;
 import com.github.seratch.jslack.api.methods.SlackApiResponse;
-import com.github.seratch.jslack.api.methods.request.groups.GroupsCreateRequest;
-import com.github.seratch.jslack.api.methods.request.groups.GroupsInviteRequest;
-import com.github.seratch.jslack.api.methods.request.groups.GroupsKickRequest;
-import com.github.seratch.jslack.api.methods.request.groups.GroupsListRequest;
+import com.github.seratch.jslack.api.methods.request.channels.ChannelsCreateRequest;
+import com.github.seratch.jslack.api.methods.request.channels.ChannelsInviteRequest;
+import com.github.seratch.jslack.api.methods.request.channels.ChannelsKickRequest;
+import com.github.seratch.jslack.api.methods.request.channels.ChannelsListRequest;
 import com.github.seratch.jslack.api.methods.request.users.UsersLookupByEmailRequest;
-import com.github.seratch.jslack.api.methods.response.channels.UsersLookupByEmailResponse;
-import com.github.seratch.jslack.api.methods.response.groups.GroupsCreateResponse;
-import com.github.seratch.jslack.api.methods.response.groups.GroupsInviteResponse;
-import com.github.seratch.jslack.api.methods.response.groups.GroupsKickResponse;
-import com.github.seratch.jslack.api.methods.response.groups.GroupsListResponse;
-import com.github.seratch.jslack.api.model.Group;
+import com.github.seratch.jslack.api.methods.response.channels.*;
+import com.github.seratch.jslack.api.model.Channel;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -46,28 +42,28 @@ public class SlackIntegrationService implements IntegrationService {
   @Override
   public void createTeam(String teamName) throws IntegrationServiceException {
     try {
-      if (getGroupIfExists(teamName).isPresent()) {
-        throw new ActionNotRequiredException("Group with name'%s' already exists in slack");
+      if (getChannelIfExists(teamName).isPresent()) {
+        throw new ActionNotRequiredException("Channel with name'%s' already exists in slack");
       }
-      GroupsCreateRequest request = GroupsCreateRequest.builder()
+      ChannelsCreateRequest request = ChannelsCreateRequest.builder()
           .name(teamName)
           .token(slackProperties.getOAuthKey())
           .build();
-      GroupsCreateResponse response = slack.methods().groupsCreate(request);
-      verifyResponse(response, String.format("Failed to create slack group of name:'%s'.", teamName));
+      ChannelsCreateResponse response = slack.methods().channelsCreate(request);
+      verifyResponse(response, String.format("Failed to create slack channel of name:'%s'.", teamName));
     } catch (SlackApiException | IOException e) {
-      throw new DataConfigurationException(String.format("Failed to create slack group of name:'%s'", teamName), e);
+      throw new DataConfigurationException(String.format("Failed to create slack channel of name:'%s'", teamName), e);
     }
   }
 
   @Override
   public TeamValidation validateTeam(String teamName) throws DataConfigurationException {
-    Group group = getGroup(teamName);
+    Channel channel = getChannel(teamName);
 
     TeamValidation teamValidation = new TeamValidation();
-    teamValidation.setTeamName(group.getName());
-    teamValidation.getAncilaryDetails().put("TeamConfiguration", group.toString());
-    teamValidation.setMembers(group.getMembers());
+    teamValidation.setTeamName(channel.getName());
+    teamValidation.getAncilaryDetails().put("TeamConfiguration", channel.toString());
+    teamValidation.setMembers(channel.getMembers());
     return teamValidation;
   }
 
@@ -86,27 +82,27 @@ public class SlackIntegrationService implements IntegrationService {
     slack = Slack.getInstance();
   }
 
-  private Group getGroup(String teamName) throws DataConfigurationException {
-    return getGroupIfExists(teamName)
-        .orElseThrow(() -> new DataConfigurationException(format("There is no group with a name of '%s'", teamName)));
+  private Channel getChannel(String teamName) throws DataConfigurationException {
+    return getChannelIfExists(teamName)
+        .orElseThrow(() -> new DataConfigurationException(format("There is no channel with a name of '%s'", teamName)));
   }
 
-  private Optional<Group> getGroupIfExists(String teamName) throws DataConfigurationException {
-    return getGroups().stream()
+  private Optional<Channel> getChannelIfExists(String teamName) throws DataConfigurationException {
+    return getChannels().stream()
         .filter(g -> g.getName().equals(teamName))
         .findFirst();
   }
 
-  private List<Group> getGroups() throws DataConfigurationException {
+  private List<Channel> getChannels() throws DataConfigurationException {
     try {
-      GroupsListRequest request = GroupsListRequest.builder()
+      ChannelsListRequest request = ChannelsListRequest.builder()
           .token(slackProperties.getOAuthKey())
           .build();
-      GroupsListResponse response = slack.methods().groupsList(request);
-      verifyResponse(response, "Error fetching slack groups.");
-      return response.getGroups();
+      ChannelsListResponse response = slack.methods().channelsList(request);
+      verifyResponse(response, "Error fetching slack channels.");
+      return response.getChannels();
     } catch (SlackApiException | IOException e) {
-      throw new DataConfigurationException("Error fetching slack groups.", e);
+      throw new DataConfigurationException("Error fetching slack channels.", e);
     }
   }
 
@@ -126,12 +122,12 @@ public class SlackIntegrationService implements IntegrationService {
 
   private void removeUserFromTeam(String teamName, String userEmail) throws DataConfigurationException {
     try {
-      GroupsKickRequest request = GroupsKickRequest.builder()
-          .channel(getGroup(teamName).getId())
+      ChannelsKickRequest request = ChannelsKickRequest.builder()
+          .channel(getChannel(teamName).getId())
           .user(getUserIdByEmail(userEmail))
           .token(slackProperties.getOAuthKey())
           .build();
-      GroupsKickResponse response = slack.methods().groupsKick(request);
+      ChannelsKickResponse response = slack.methods().channelsKick(request);
       verifyResponse(response, format("Error removing user '%s' from team '%s'", userEmail, teamName));
     } catch (SlackApiException | IOException e) {
       throw new DataConfigurationException(format("Error removing user '%s' from team '%s'", userEmail, teamName), e);
@@ -140,12 +136,12 @@ public class SlackIntegrationService implements IntegrationService {
 
   private void addUserToTeam(String teamName, String userEmail) throws DataConfigurationException {
     try {
-      GroupsInviteRequest request = GroupsInviteRequest.builder()
-          .channel(getGroup(teamName).getId())
+      ChannelsInviteRequest request = ChannelsInviteRequest.builder()
+          .channel(getChannel(teamName).getId())
           .token(slackProperties.getOAuthKey())
           .user(getUserIdByEmail(userEmail))
           .build();
-      GroupsInviteResponse response = slack.methods().groupsInvite(request);
+      ChannelsInviteResponse response = slack.methods().channelsInvite(request);
       verifyResponse(response, format("Error adding user '%s' to team '%s'", userEmail, teamName));
     } catch (SlackApiException | IOException e) {
       throw new DataConfigurationException(format("Error adding user '%s' to team '%s'", userEmail, teamName), e);
