@@ -60,7 +60,7 @@ public class EventBriteUserImportService extends AbstractCsvUserImportService {
         .firstName(record.get(Headers.FIRST_NAME))
         .lastName(record.get(Headers.LAST_NAME))
         .githubUsername(record.get(Headers.GITHUB_USERNAME))
-        .slackEmail(record.get(Headers.SLACK_INVITE_EMAIL))
+        .slackEmail(getSlackEmail(record))
         .build();
   }
 

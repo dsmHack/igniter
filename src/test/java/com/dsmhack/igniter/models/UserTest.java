@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestUser {
+public class UserTest {
 
   @Test
   public void testUserImportService_constructor() {
