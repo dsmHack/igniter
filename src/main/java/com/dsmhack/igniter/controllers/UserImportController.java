@@ -69,7 +69,7 @@ public class UserImportController {
     teamConfigurationService.createTeams(teamPrefix, numberOfTeams)
         .forEach(teamName -> teamConfigurationService.addUsersToTeam(teamName, users));
 
-    return "redirect:/";
+    return "redirect:/users";
   }
 
   private String getTeamPrefix() {
