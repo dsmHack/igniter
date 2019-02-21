@@ -35,6 +35,9 @@
       <li class="nav-item" th:classappend="${#httpServletRequest.requestURI == '/users' ? 'active':''}">
         <a class="nav-link" th:href="@{/users}">Users</a>
       </li>
+      <li class="nav-item" th:classappend="${#httpServletRequest.requestURI == '/slackInvite' ? 'active':''}">
+        <a class="nav-link" th:href="@{/slackInvite}">Slack Invite</a>
+      </li>
     </ul>
   </div>
 </nav>

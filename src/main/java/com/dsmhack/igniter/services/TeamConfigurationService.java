@@ -37,8 +37,12 @@ public class TeamConfigurationService {
   public String createTeam(String teamName) {
     this.integrationServices
         .forEach((IntegrationService integrationService) -> {
+          try {
             System.out.println("creating team: " + teamName);
             integrationService.createTeam(teamName);
+          } catch (ActionNotRequiredException e) {
+            System.out.println(e.getMessage());
+          }
         });
     return teamName;
   }

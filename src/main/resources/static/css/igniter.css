@@ -1,3 +1,19 @@
 body {
   padding-top: 5rem;
 }
+
+.slack-invite-list {
+  color: #676767;
+}
+
+.slack-invite-list pre {
+  word-break: break-all;
+  white-space: pre-wrap;
+  margin: 20px 0;
+  padding: 15px 20px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ccc;
+  background-color: #fcfcfc;
+  font-family: monospace;
+}

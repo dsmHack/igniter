@@ -25,6 +25,7 @@ public abstract class AbstractCsvUserImportService implements UserImportService 
     return StreamSupport.stream(getRecords(reader).spliterator(), false)
         .skip(1)
         .map(this::createUser)
+        .filter(user -> !user.getFirstName().toUpperCase().contains("NOT ATTENDING"))
         .collect(Collectors.toList());
   }
 
