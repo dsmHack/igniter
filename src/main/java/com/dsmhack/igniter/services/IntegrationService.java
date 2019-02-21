@@ -8,7 +8,7 @@ import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
 import java.io.IOException;
 
 public interface IntegrationService {
-    String getIntegrationServiceName();
+    String getIntegrationName();
 
     void createTeam(String teamName) throws DataConfigurationException, ActionNotRequiredException;
     TeamValidation validateTeam(String team) throws DataConfigurationException;

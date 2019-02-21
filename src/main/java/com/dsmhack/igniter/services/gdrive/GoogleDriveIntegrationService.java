@@ -31,7 +31,7 @@ public class GoogleDriveIntegrationService implements IntegrationService {
     }
 
     @Override
-    public String getIntegrationServiceName() {
+    public String getIntegrationName() {
         return "gdrive";
     }
 }

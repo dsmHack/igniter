@@ -51,7 +51,7 @@ public class TeamConfigurationService {
     this.integrationServicesRegistry.getActiveIntegrationServices().forEach(integrationService -> {
       ActionLogger actionLogger = new ActionLogger();
       actions.add(actionLogger);
-      actionLogger.setIntegrationServiceName(integrationService.getIntegrationServiceName());
+      actionLogger.setIntegrationServiceName(integrationService.getIntegrationName());
       actionLogger.setActionAttempted(String.format("Adding user '%s' to team '%s'", user, teamName));
       try {
         System.out.println("Adding User: " + user.getFirstName() + " " + user.getLastName() + " teamName: " + teamName);

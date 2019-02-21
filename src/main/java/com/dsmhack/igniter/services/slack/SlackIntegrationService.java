@@ -42,7 +42,7 @@ public class SlackIntegrationService implements IntegrationService {
   }
 
   @Override
-  public String getIntegrationServiceName() {
+  public String getIntegrationName() {
     return "slack";
   }
 
@@ -167,7 +167,7 @@ public class SlackIntegrationService implements IntegrationService {
 
   @PostConstruct
   public void configure() {
-    if (igniterProperties.isActiveIntegration(this.getIntegrationServiceName())) {
+    if (igniterProperties.isActiveIntegration(this.getIntegrationName())) {
       slack = Slack.getInstance();
     }
   }

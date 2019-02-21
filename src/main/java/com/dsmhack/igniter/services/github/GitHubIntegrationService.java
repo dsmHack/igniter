@@ -37,7 +37,7 @@ public class GitHubIntegrationService implements IntegrationService {
   }
 
   @Override
-  public String getIntegrationServiceName() {
+  public String getIntegrationName() {
     return "gitHub";
   }
 
@@ -160,7 +160,7 @@ public class GitHubIntegrationService implements IntegrationService {
 
   @PostConstruct
   public void configure() throws IOException {
-    if (igniterProperties.isActiveIntegration(this.getIntegrationServiceName())) {
+    if (igniterProperties.isActiveIntegration(this.getIntegrationName())) {
       gitHubService = new GitHubBuilder()
           .withOAuthToken(this.gitHubProperties.getOAuthKey(), this.gitHubProperties.getOrgName())
           .build();

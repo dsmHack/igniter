@@ -21,7 +21,7 @@ public class IntegrationServicesRegistry {
 
   public List<IntegrationService> getActiveIntegrationServices() {
     return this.availableServices.stream()
-        .filter(integrationService -> igniterProperties.isActiveIntegration(integrationService.getIntegrationServiceName()))
+        .filter(integrationService -> igniterProperties.isActiveIntegration(integrationService.getIntegrationName()))
         .collect(Collectors.toList());
   }
 
