@@ -1,0 +1,7 @@
+[{
+  "firstName": "Tony", "lastName": "Stark", "slackEmail": "tony@starkindustries.com", "githubUsername": "ironman"
+}, {
+  "firstName": "Steve", "lastName": "Rogers", "slackEmail": "steve.rogers@hotmail.com", "githubUsername": "captain"
+}, {
+  "firstName": "Bruce", "lastName": "Banner", "slackEmail": "bbanner@gmail.com", "githubUsername": "hulk"
+}]

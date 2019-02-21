@@ -1,6 +1,7 @@
 package com.dsmhack.igniter.services.user;
 
 import com.dsmhack.igniter.models.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,15 +11,15 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class EventBriteUserImportServiceTest {
+public class JsonUserImportServiceTest {
 
-  private static final String USER_FILE_PATH = "src/test/resources/mock-event-brite-users.csv";
+  private static final String USER_FILE_PATH = "src/test/resources/mock-users.json";
 
-  private EventBriteUserImportService userImportService;
+  private JsonUserImportService userImportService;
 
   @Before
   public void before() {
-    userImportService = new EventBriteUserImportService();
+    userImportService = new JsonUserImportService(new ObjectMapper());
   }
 
   @Test
