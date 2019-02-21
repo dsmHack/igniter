@@ -1,56 +1,45 @@
 package com.dsmhack.igniter.services.github;
 
-import com.dsmhack.igniter.IgniterProperties;
 import com.dsmhack.igniter.models.TeamValidation;
 import com.dsmhack.igniter.models.User;
 import com.dsmhack.igniter.services.IntegrationService;
 import com.dsmhack.igniter.services.exceptions.ActionNotRequiredException;
 import com.dsmhack.igniter.services.exceptions.DataConfigurationException;
+import com.dsmhack.igniter.services.exceptions.IntegrationServiceException;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.kohsuke.github.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Service
 public class GitHubIntegrationService implements IntegrationService {
 
-  private final IgniterProperties igniterProperties;
   private final GitHubProperties gitHubProperties;
 
   private GitHubClient gitHubClient;
   private GitHub gitHubService;
   private GHOrganization organization;
 
-  @Autowired
-  public GitHubIntegrationService(IgniterProperties igniterProperties,
-                                  GitHubProperties gitHubProperties) {
-    this.igniterProperties = igniterProperties;
+  public GitHubIntegrationService(GitHubProperties gitHubProperties) {
     this.gitHubProperties = gitHubProperties;
   }
 
   @Override
   public String getIntegrationName() {
-    return "gitHub";
+    return "github";
   }
 
   @Override
-  public void createTeam(String teamName) {
-    GHRepository ghRepository;
-    GHTeam team;
+  public void createTeam(String teamName) throws DataConfigurationException {
     try {
-      ghRepository = buildOrGetRepository(teamName);
-      team = buildOrGetTeam(teamName, ghRepository);
+      GHRepository ghRepository = buildOrGetRepository(teamName);
+      GHTeam team = buildOrGetTeam(teamName, ghRepository);
       team.add(ghRepository, GHOrganization.Permission.PUSH);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new DataConfigurationException(String.format("Error creating team '%s'.", teamName), e);
     }
   }
 
@@ -59,115 +48,158 @@ public class GitHubIntegrationService implements IntegrationService {
     return null;
   }
 
-  private GHTeam getTeamByName(String teamName) throws IOException, DataConfigurationException {
-    GHTeam teamByName = organization.getTeamByName(teamName);
-    if (teamByName == null) {
-      throw new DataConfigurationException(String.format("Tried to work with non-existent team %s", teamName));
-    }
-    return teamByName;
+  private boolean isUserMember(String teamName, User user) throws DataConfigurationException {
+    GHTeam teamByName = getTeamByName(teamName);
+    return getUserForTeam(user, teamByName).isPresent();
   }
 
-
-  private boolean isUserMember(String teamName, User user) throws DataConfigurationException, IOException {
-    GHTeam teamByName = null;
+  private Optional<GHUser> getUserForTeam(User user, GHTeam team) throws DataConfigurationException {
     try {
-      teamByName = getTeamByName(teamName);
-    } catch (Exception e) {
-      throw new DataConfigurationException(String.format(
-          "Error in fetching team %s while checking for user '%s' membership ",
-          user.getGithubUsername(),
-          teamName), e);
+      return team.getMembers().stream()
+          .filter(u -> u.getLogin().equals(user.getGithubUsername()))
+          .findFirst();
+    } catch (IOException e) {
+      throw new DataConfigurationException(
+          String.format("Error fetching user '%s' from team '%s'", user.getGithubUsername(), team.getName())
+      );
     }
-    return getUserForTeam(user, teamByName) != null;
-  }
-
-  private GHUser getUserForTeam(User user, GHTeam team) throws IOException {
-    return team.getMembers().stream()
-        .filter(u -> u.getLogin().equals(user.getGithubUsername()))
-        .findFirst()
-        .orElse(null);
   }
 
   @Override
   public void addUserToTeam(String teamName,
-                            User user) throws ActionNotRequiredException, DataConfigurationException, IOException {
-    if (isUserMember(teamName, user)) {
-      throw new ActionNotRequiredException(String.format("User '%s' is already on the team %s",
-                                                         user.getGithubUsername(),
-                                                         teamName));
+                            User user) throws IntegrationServiceException {
+    try {
+      if (!StringUtils.isEmpty(user.getGithubUsername())) {
+        if (isUserMember(teamName, user)) {
+          throw new ActionNotRequiredException(
+              String.format("User '%s' is already on the team %s", user.getGithubUsername(), teamName)
+          );
+        }
+        GHUser ghUser = getUser(user.getGithubUsername());
+        GHTeam teamByName = getTeamByName(teamName);
+        teamByName.add(ghUser, GHTeam.Role.MEMBER);
+      }
+    } catch (IOException e) {
+      throw new DataConfigurationException(
+          String.format("Error adding user '%s' to team '%s'.", user.getGithubUsername(), teamName), e
+      );
     }
-    GHUser ghUser = gitHubService.getUser(user.getGithubUsername());
-    GHTeam teamByName = organization.getTeamByName(teamName);
-    teamByName.add(ghUser, GHTeam.Role.MEMBER);
   }
 
   @Override
-  public void removeUserFromTeam(String teamName,
-                                 User user) throws IOException, DataConfigurationException, ActionNotRequiredException {
-    if (!isUserMember(teamName, user)) {
-      throw new ActionNotRequiredException(String.format("User '%s' is already not part of the team '%s'",
-                                                         user.getGithubUsername(),
-                                                         teamName));
+  public void removeUserFromTeam(String teamName, User user) throws IntegrationServiceException {
+    try {
+      GHTeam team = getTeamByName(teamName);
+
+      GHUser userForTeam = getUserForTeam(user, team).orElseThrow(
+          () -> new ActionNotRequiredException(
+              String.format("User '%s' is already not part of the team '%s'", user.getGithubUsername(), teamName)
+          )
+      );
+      team.remove(userForTeam);
+    } catch (IOException e) {
+      throw new DataConfigurationException(
+          String.format("Error removing user '%s' from team '%s'.", user.getGithubUsername(), teamName), e
+      );
     }
-    GHTeam team = getTeam(teamName);
-    team.remove(getUserForTeam(user, team));
   }
 
-  private GHTeam buildOrGetTeam(String teamName, GHRepository ghRepository) throws IOException {
-    GHTeam team = getTeam(teamName);
-    if (team == null) {
+  private GHTeam buildOrGetTeam(String teamName, GHRepository ghRepository) throws DataConfigurationException {
+    Optional<GHTeam> optionalTeam = getTeamIfExists(teamName);
+    if (!optionalTeam.isPresent()) {
       createTeam(gitHubProperties.getOrgName(), teamName, Collections.singletonList(ghRepository.getFullName()));
-      team = getTeam(teamName);
+      optionalTeam = getTeamIfExists(teamName);
     }
-    return team;
+    return optionalTeam.orElse(null);
   }
 
-  private GHTeam getTeam(String teamName) throws IOException {
-    return organization.getTeamByName(teamName);
+  private GHTeam getTeamByName(String teamName) throws DataConfigurationException {
+    return getTeamIfExists(teamName)
+        .orElseThrow(
+            () -> new DataConfigurationException(String.format("Tried to work with non-existent team %s", teamName))
+        );
   }
 
-  private Team createTeam(String organization, String teamName, List<String> repoNames) throws IOException {
-    Team team = new Team();
-    team.setPermission("admin");
-    team.setName(teamName);
-    StringBuilder uri = new StringBuilder("/orgs");
-    uri.append('/').append(organization);
-    uri.append("/teams");
-    Map<String, Object> params = new HashMap();
-    params.put("name", team.getName());
-    params.put("permission", team.getPermission());
-    params.put("privacy", "closed");
-    if (repoNames != null) {
-      params.put("repo_names", repoNames);
+  private Optional<GHTeam> getTeamIfExists(String teamName) throws DataConfigurationException {
+    try {
+      return Optional.ofNullable(organization.getTeamByName(teamName));
+    } catch (IOException e) {
+      throw new DataConfigurationException(String.format("Error fetching team '%s'.", teamName), e);
     }
-    params.put("maintainers", Collections.singletonList(gitHubService.getMyself().getLogin()));
-    return (Team) gitHubClient.post(uri.toString(), params, Team.class);
   }
 
-  private GHRepository buildOrGetRepository(String teamName) throws IOException {
+  private GHUser getUser(String login) throws DataConfigurationException {
+    return getUserIfExists(login)
+        .orElseThrow(
+            () -> new DataConfigurationException(String.format("Error fetching user '%s'.", login))
+        );
+  }
+
+  private Optional<GHUser> getUserIfExists(String login) throws DataConfigurationException {
+    try {
+      return Optional.ofNullable(gitHubService.getUser(login));
+    } catch (IOException e) {
+      throw new DataConfigurationException(String.format("Error fetching user '%s'.", login), e);
+    }
+  }
+
+  private Team createTeam(String organization,
+                          String teamName,
+                          List<String> repoNames) throws DataConfigurationException {
+    try {
+      Team team = new Team();
+      team.setPermission("admin");
+      team.setName(teamName);
+      Map<String, Object> params = new HashMap<>();
+      params.put("name", team.getName());
+      params.put("permission", team.getPermission());
+      params.put("privacy", "closed");
+      if (repoNames != null) {
+        params.put("repo_names", repoNames);
+      }
+      params.put("maintainers", Collections.singletonList(gitHubService.getMyself().getLogin()));
+
+      String uri = "/orgs/" + organization + "/teams";
+      return (Team) gitHubClient.post(uri, params, Team.class);
+    } catch (IOException e) {
+      throw new DataConfigurationException(String.format("Error creating team '%s'.", teamName), e);
+    }
+  }
+
+  private GHRepository buildOrGetRepository(String teamName) throws DataConfigurationException {
     GHRepository repository = getRepositoryIfExists(teamName);
     if (repository == null) {
-      repository = organization.createRepository(teamName)
-          .description("This is the repo for the '" + gitHubProperties.getPrefix() + "' event for the team:'" + teamName + "'")
-          .create();
+      repository = createRepository(teamName);
     }
     return repository;
   }
 
-  private GHRepository getRepositoryIfExists(String teamName) throws IOException {
-    return organization.getRepository(teamName);
+  private GHRepository getRepositoryIfExists(String teamName) throws DataConfigurationException {
+    try {
+      return organization.getRepository(teamName);
+    } catch (IOException e) {
+      throw new DataConfigurationException("Error getting repository '%s'.", e);
+    }
+  }
+
+  private GHRepository createRepository(String teamName) throws DataConfigurationException {
+    try {
+      return organization.createRepository(teamName)
+          .description("This is the repo for the dsmHack event for the team: " + teamName + "")
+          .create();
+    } catch (IOException e) {
+      throw new DataConfigurationException(String.format("Error creating repository '%s'.", teamName), e);
+    }
   }
 
   @PostConstruct
   public void configure() throws IOException {
-    if (igniterProperties.isActiveIntegration(this.getIntegrationName())) {
-      gitHubService = new GitHubBuilder()
-          .withOAuthToken(this.gitHubProperties.getOAuthKey(), this.gitHubProperties.getOrgName())
-          .build();
-      organization = gitHubService.getOrganization(this.gitHubProperties.getOrgName());
-      gitHubClient = new GitHubClient();
-      gitHubClient.setOAuth2Token(this.gitHubProperties.getOAuthKey());
-    }
+    gitHubService = new GitHubBuilder()
+        .withOAuthToken(this.gitHubProperties.getOAuthKey(), this.gitHubProperties.getOrgName())
+        .build();
+    organization = gitHubService.getOrganization(this.gitHubProperties.getOrgName());
+    gitHubClient = new GitHubClient();
+    gitHubClient.setOAuth2Token(this.gitHubProperties.getOAuthKey());
   }
 
 }

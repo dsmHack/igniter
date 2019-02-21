@@ -6,12 +6,9 @@ igniter.active-integrations=gitHub,slack
 igniter.team-prefix=2019_team
 igniter.team-number=2
 
-igniter.github.client-id=
-igniter.github.secret-key=
+igniter.github.enabled=
 igniter.github.oauth-key=
 igniter.github.org-name=
-igniter.github.prefix=
 
-igniter.slack.client-id=
-igniter.slack.client-secret=
+igniter.slack.enabled=
 igniter.slack.oauth-key=
