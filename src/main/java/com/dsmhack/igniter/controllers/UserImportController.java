@@ -1,7 +1,9 @@
 package com.dsmhack.igniter.controllers;
 
-import com.dsmhack.igniter.BatchRunner;
 import com.dsmhack.igniter.models.User;
+import com.dsmhack.igniter.services.IntegrationServicesRegistry;
+import com.dsmhack.igniter.services.TeamConfigurationService;
+import com.dsmhack.igniter.services.TeamConfigurationServiceFactory;
 import com.dsmhack.igniter.services.user.UserFormat;
 import com.dsmhack.igniter.services.user.UserImportException;
 import com.dsmhack.igniter.services.user.UserImportService;
@@ -24,19 +26,23 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserImportController {
 
-  private final BatchRunner batchRunner;
   private final UserImportServiceRegistry userImportServiceRegistry;
+  private final IntegrationServicesRegistry integrationServicesRegistry;
+  private final TeamConfigurationServiceFactory teamConfigurationServiceFactory;
 
-  public UserImportController(BatchRunner batchRunner,
-                              UserImportServiceRegistry userImportServiceRegistry) {
-    this.batchRunner = batchRunner;
+  public UserImportController(UserImportServiceRegistry userImportServiceRegistry,
+                              IntegrationServicesRegistry integrationServicesRegistry,
+                              TeamConfigurationServiceFactory teamConfigurationServiceFactory) {
     this.userImportServiceRegistry = userImportServiceRegistry;
+    this.integrationServicesRegistry = integrationServicesRegistry;
+    this.teamConfigurationServiceFactory = teamConfigurationServiceFactory;
   }
 
   @GetMapping
   public String userImportForm(Model model) {
     model.addAttribute("teamPrefix", getTeamPrefix());
     model.addAttribute("userFormats", userImportServiceRegistry.getSupportedFormats());
+    model.addAttribute("integrations", integrationServicesRegistry.getSupportedIntegrations());
     return "userImport";
   }
 
@@ -45,6 +51,7 @@ public class UserImportController {
                             @RequestParam("teamPrefix") String teamPrefix,
                             @RequestParam("numberOfTeams") int numberOfTeams,
                             @RequestParam("userFormat") UserFormat userFormat,
+                            @RequestParam("integrations") List<String> integrations,
                             RedirectAttributes redirectAttributes) throws IOException, UserImportException {
 
     UserImportService userImportService = userImportServiceRegistry.getService(userFormat)
@@ -57,7 +64,10 @@ public class UserImportController {
         "You successfully uploaded " + users.size() + " users from " + file.getOriginalFilename()
     );
 
-    batchRunner.onboardEveryone(teamPrefix, numberOfTeams, users);
+    TeamConfigurationService teamConfigurationService = teamConfigurationServiceFactory.create(integrations);
+
+    teamConfigurationService.createTeams(teamPrefix, numberOfTeams)
+        .forEach(teamName -> teamConfigurationService.addUsersToTeam(teamName, users));
 
     return "redirect:/";
   }

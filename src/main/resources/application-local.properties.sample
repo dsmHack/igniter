@@ -1,9 +1,5 @@
 # Make a copy of this sample file named "application-local.properties" for local development.
 
-igniter.user.format=EVENTBRITE
-
-igniter.active-integrations=gitHub,slack
-
 igniter.github.enabled=
 igniter.github.oauth-key=
 igniter.github.org-name=
